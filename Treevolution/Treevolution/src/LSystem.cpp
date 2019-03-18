@@ -49,7 +49,7 @@ const std::string& LSystem::getIteration(unsigned int n)
 {
     if (n >= iterations.size())
     {
-        for (unsigned int i = iterations.size(); i <= n; i++)
+        for (size_t i = iterations.size(); i <= n; i++)
         {
             current = iterate(current);
             iterations.push_back(current);
