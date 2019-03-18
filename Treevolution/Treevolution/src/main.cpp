@@ -2,6 +2,9 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
+#include "OpenGL/ShaderProgram.h"
+#include "Scene/DrawableLine.h"
+
 #include <iostream>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
@@ -17,11 +20,11 @@ void processInput(GLFWwindow *window) {
 int main() {
     // Setup GLFW
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(800, 600, "Treevolution", NULL, NULL);
     if (window == NULL) {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -36,6 +39,23 @@ int main() {
         return -1;
     }
 
+    // Load shader programs
+    ShaderProgram flatShader = ShaderProgram("src/Shaders/flat.vert", "src/Shaders/flat.frag");
+
+    // Array/Buffer Objects
+    unsigned int VAO;
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
+
+    // Scene data
+    DrawableLine lines = DrawableLine();
+    Line l;
+    l.start = glm::vec3(0.0f, 0.0f, 0.0f);
+    l.end = glm::vec3(0.0f, 0.5f, 0.0f);
+    lines.addLineSegment(l);
+    // TODO: push back more lines
+    lines.create();
+
     while (!glfwWindowShouldClose(window)) {
         // Input handling
         processInput(window);
@@ -44,11 +64,18 @@ int main() {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        // Draw the scene
+        flatShader.Draw(lines);
+
         // Check/call events, swap buffers
         glfwPollEvents();
         glfwSwapBuffers(window);
     }
 
+    // Cleanup
+    glDeleteVertexArrays(1, &VAO);
+    lines.destroy();
     glfwTerminate();
-    return 0;
+
+    exit(EXIT_SUCCESS);
 }

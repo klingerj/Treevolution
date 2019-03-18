@@ -20,7 +20,19 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Libraries\glad\src\glad.c" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\OpenGL\Drawable.cpp" />
+    <ClCompile Include="src\OpenGL\ShaderProgram.cpp" />
+    <ClCompile Include="src\Scene\DrawableLine.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\OpenGL\Drawable.h" />
+    <ClInclude Include="src\OpenGL\ShaderProgram.h" />
+    <ClInclude Include="src\Scene\DrawableLine.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\Shaders\flat.frag" />
+    <None Include="src\Shaders\flat.vert" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
