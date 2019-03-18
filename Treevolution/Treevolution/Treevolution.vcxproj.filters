@@ -45,6 +45,9 @@
     <ClCompile Include="src\Scene\DrawableLine.cpp">
       <Filter>Source Files\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="src\LSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\OpenGL\Drawable.h">
@@ -55,6 +58,9 @@
     </ClInclude>
     <ClInclude Include="src\Scene\DrawableLine.h">
       <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LSystem.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

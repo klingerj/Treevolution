@@ -4,6 +4,7 @@
 
 #include "OpenGL/ShaderProgram.h"
 #include "Scene/DrawableLine.h"
+#include "LSystem.h"
 
 #include <iostream>
 
@@ -53,7 +54,27 @@ int main() {
     l.start = glm::vec3(0.0f, 0.0f, 0.0f);
     l.end = glm::vec3(0.0f, 0.5f, 0.0f);
     lines.addLineSegment(l);
-    // TODO: push back more lines
+    
+	// Create L-system
+	LSystem sys;
+	sys.setDefaultStep(1.0);
+	sys.setDefaultAngle(30.0);
+	sys.loadProgramFromString("F\nF->F[+F]F[-F]F"); //taken from simple1.txt
+
+	// Run turtle
+	std::vector<LSystem::Branch> branches;
+	std::vector<LSystem::Geometry> models;
+	sys.process(2, branches, models); 
+
+	// Create lines from branches
+	for (LSystem::Branch b : branches)
+	{
+		Line l;
+		l.start = b.first;
+		l.end = b.second;
+		lines.addLineSegment(l);
+	}
+
     lines.create();
 
     while (!glfwWindowShouldClose(window)) {

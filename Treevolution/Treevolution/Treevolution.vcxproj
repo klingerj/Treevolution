@@ -20,12 +20,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Libraries\glad\src\glad.c" />
+    <ClCompile Include="src\LSystem.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\OpenGL\Drawable.cpp" />
     <ClCompile Include="src\OpenGL\ShaderProgram.cpp" />
     <ClCompile Include="src\Scene\DrawableLine.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\LSystem.h" />
     <ClInclude Include="src\OpenGL\Drawable.h" />
     <ClInclude Include="src\OpenGL\ShaderProgram.h" />
     <ClInclude Include="src\Scene\DrawableLine.h" />
