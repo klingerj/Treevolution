@@ -9,7 +9,6 @@
 class LSystem
 {
 public:
-    typedef std::pair<glm::vec3, std::string> Geometry;
     typedef std::pair<glm::vec3, glm::vec3> Branch;
 
 public:
@@ -32,14 +31,6 @@ public:
     // Get geometry from running the turtle
     void process(unsigned int n, 
         std::vector<Branch>& branches);
-    void process(unsigned int n, 
-        std::vector<Branch>& branches, 
-        std::vector<Geometry>& models);
-
-	// Process the L-System and return the branches and the flowers.
-	void processPy(unsigned int n,
-		std::vector<std::vector<float> >& branches, 
-        std::vector<std::vector<float> >& flowers);
 
 protected:
     void reset();

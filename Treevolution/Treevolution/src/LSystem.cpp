@@ -194,64 +194,11 @@ void LSystem::Turtle::applyForwardRot(float degrees)
 void LSystem::process(unsigned int n, 
     std::vector<Branch>& branches)
 {
-    std::vector<Geometry> models;
-    process(n,branches,models);
-}
-
-// TODO:: Finish this function.
-//        This is the function that will be called from Python to generate the branches and flowers.
-//        Notice the argument types. Since we are interfacing with Python, we must simplify the data
-//          types that we are using because Python cannot easily handle the "vec" class that is usually 
-//          used in the Branch. Instead, we will return slightly altered data packets:
-//				flowers:  vector of vector of floats: [posx, posy, poz]
-//              branches: vector of vector of floats: [startx, starty, startz, endx, endy, endz]
-//
-//         You will need to repackage the branches and flowers so that they can be passed to Python
-//           in the format described above. Notice that in the LSystem.i file, we have defined
-//           a std::vector<float> as a VecFloat in Python and a std::vector<std::vector<float> > as
-//           a VectorPyBranch in Python.
-void LSystem::processPy(unsigned int n,
-		std::vector<std::vector<float> >& branches, std::vector<std::vector<float> >& flowers) {
-		
-	std::vector<Branch> preBranches;
-    std::vector<Geometry> preFlowers;
-
-	process(n, preBranches, preFlowers);
-
-	for (Branch b : preBranches)
-	{
-		std::vector<float> thisBranch;
-		thisBranch.push_back(b.first[0]);
-		thisBranch.push_back(b.first[1]);
-		thisBranch.push_back(b.first[2]);
-		thisBranch.push_back(b.second[0]);
-		thisBranch.push_back(b.second[1]);
-		thisBranch.push_back(b.second[2]);
-		branches.push_back(thisBranch);
-	}
-
-	for (Geometry f : preFlowers)
-	{
-		std::vector<float> thisFlower;
-		thisFlower.push_back(f.first[0]);
-		thisFlower.push_back(f.first[1]);
-		thisFlower.push_back(f.first[2]);
-		flowers.push_back(thisFlower);
-	}
-}
-
-// LOOK: This is where the L-System creates the branches and the flowers.
-//        Branches are returns in the "branches" vector and flowers (or other symbols) are
-//        returned in the "models" vector.
-void LSystem::process(unsigned int n, 
-    std::vector<Branch>& branches, 
-    std::vector<Geometry>& models)
-{
     Turtle turtle;
     std::stack<Turtle> stack;
 
     // Init so we're pointing up
-    turtle.applyLeftRot(-90);
+    //turtle.applyLeftRot(-90);
 
     std::string insn = getIteration(n);
 
@@ -307,12 +254,6 @@ void LSystem::process(unsigned int n,
         {
             turtle = stack.top();
             stack.pop();
-        }
-        else
-        {
-			// LOOK: When a different symbol (such as a *) is encountered, the turtle's position 
-			//        along with the corresponding symbol is added to the models vector.
-            models.push_back(Geometry(turtle.pos, sym));
         }
     }
 }
