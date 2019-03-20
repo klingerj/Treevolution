@@ -28,6 +28,18 @@
     <Filter Include="Header Files\Scene">
       <UniqueIdentifier>{2a0b9e69-1557-4ffd-ac78-6ca47a47f5be}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\GeneticAlgorithms">
+      <UniqueIdentifier>{e93a1f7e-cb6f-4eb0-8b64-18aaeecd6982}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GeneticAlgorithms\Fitness">
+      <UniqueIdentifier>{1244a57a-c3e8-443e-b079-f0a776728425}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\GeneticAlgorithms">
+      <UniqueIdentifier>{2e1d6a7c-5952-4f9f-833c-2841e8ecf046}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\GeneticAlgorithms\Fitness">
+      <UniqueIdentifier>{07652b2f-a582-40a7-93a1-0492140f37f3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Libraries\glad\src\glad.c">
@@ -48,6 +60,9 @@
     <ClCompile Include="src\LSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\GeneticAlgorithms\Fitness\FitnessEvalMethod.cpp">
+      <Filter>Source Files\GeneticAlgorithms\Fitness</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\OpenGL\Drawable.h">
@@ -61,6 +76,9 @@
     </ClInclude>
     <ClInclude Include="src\LSystem.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GeneticAlgorithms\Fitness\FitnessEvalMethod.h">
+      <Filter>Header Files\GeneticAlgorithms\Fitness</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

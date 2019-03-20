@@ -67,10 +67,12 @@ int main() {
 	std::vector<LSystem::Geometry> models;
 	sys.process(2, branches, models);
 
+  // Load reference model
+
   // Volumetric fitness evaluation
   FitnessEvalMethod* eval = new VolumetricFitnessEval({ 10, 10, 10 });
 
-  //eval.SetReferenceGrid(referenceTris);
+  eval.SetReferenceGrid(referenceTris);
 
 	// Create lines from branches
 	for (LSystem::Branch b : branches)
