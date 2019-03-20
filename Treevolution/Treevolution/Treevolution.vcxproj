@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\Libraries\glad\src\glad.c" />
     <ClCompile Include="src\GeneticAlgorithms\Fitness\FitnessEvalMethod.cpp" />
+    <ClCompile Include="src\GeneticAlgorithms\TreeStructure.cpp" />
     <ClCompile Include="src\LSystem.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\OpenGL\Drawable.cpp" />
@@ -31,6 +32,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GeneticAlgorithms\Fitness\FitnessEvalMethod.h" />
+    <ClInclude Include="src\GeneticAlgorithms\TreeStructure.h" />
     <ClInclude Include="src\Globals.h" />
     <ClInclude Include="src\LSystem.h" />
     <ClInclude Include="src\OpenGL\Drawable.h" />
@@ -129,6 +131,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

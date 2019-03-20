@@ -3,6 +3,8 @@
 #include <stack>
 #include <glm/gtc/matrix_transform.hpp>
 
+#define Deg2Rad 0.017453292519943295769236907684886
+
 TreeStructure::TreeStructure(std::string gram, float minAngle, float maxAngle, 
     float minLen, float maxLen) : mGrammar(gram), mMinAngle(minAngle), mMaxAngle(maxAngle),
     mMinLen(minLen), mMaxLen(maxLen)
@@ -47,27 +49,27 @@ void TreeStructure::Turtle::moveForward(float length)
 
 void TreeStructure::Turtle::applyUpRot(float degrees)
 {
-    glm::mat4 mat = glm::rotate(glm::mat4(1.0), float(Deg2Rad*degrees), glm::vec3(0, 0, 1)); // Z axis
-    glm::mat4 world2local = glm::mat4(forward, left, up, glm::vec4(0.0));
-    up = world2local * mat * glm::vec4(0, 0, 1, 1);
-    left = world2local * mat * glm::vec4(0, 1, 0, 1);
-    forward = world2local * mat * glm::vec4(1, 0, 0, 1);
+    glm::mat4 mat = glm::rotate(glm::mat4(1.0), float(Deg2Rad*degrees), glm::vec3(0, 1, 0)); // Y axis
+    glm::mat4 world2local = glm::mat4(left, up, forward, glm::vec4(0.0));
+    up = world2local * mat * glm::vec4(0, 1, 0, 1);
+    left = world2local * mat * glm::vec4(1, 0, 0, 1);
+    forward = world2local * mat * glm::vec4(0, 0, 1, 1);
 }
 
 void TreeStructure::Turtle::applyLeftRot(float degrees)
 {
-    glm::mat4 mat = glm::rotate(glm::mat4(1.0), float(Deg2Rad*degrees), glm::vec3(0, 1, 0)); // Y axis
-    glm::mat4 world2local = glm::mat4(forward, left, up, glm::vec4(0.0));
-    up = world2local * mat * glm::vec4(0, 0, 1, 1);
-    left = world2local * mat * glm::vec4(0, 1, 0, 1);
-    forward = world2local * mat * glm::vec4(1, 0, 0, 1);
+    glm::mat4 mat = glm::rotate(glm::mat4(1.0), float(Deg2Rad*degrees), glm::vec3(1, 0, 0)); // X axis
+    glm::mat4 world2local = glm::mat4(left, up, forward, glm::vec4(0.0));
+    up = world2local * mat * glm::vec4(0, 1, 0, 1);
+    left = world2local * mat * glm::vec4(1, 0, 0, 1);
+    forward = world2local * mat * glm::vec4(0, 0, 1, 1);
 }
 
 void TreeStructure::Turtle::applyForwardRot(float degrees)
 {
-    glm::mat4 mat = glm::rotate(glm::mat4(1.0), float(Deg2Rad*degrees), glm::vec3(1, 0, 0)); // X axis
-    glm::mat4 world2local = glm::mat4(forward, left, up, glm::vec4(0.0));
-    up = world2local * mat * glm::vec4(0, 0, 1, 1);
-    left = world2local * mat * glm::vec4(0, 1, 0, 1);
-    forward = world2local * mat * glm::vec4(1, 0, 0, 1);
+    glm::mat4 mat = glm::rotate(glm::mat4(1.0), float(Deg2Rad*degrees), glm::vec3(0, 0, 1)); // Z axis
+    glm::mat4 world2local = glm::mat4(left, up, forward, glm::vec4(0.0));
+    up = world2local * mat * glm::vec4(0, 1, 0, 1);
+    left = world2local * mat * glm::vec4(1, 0, 0, 1);
+    forward = world2local * mat * glm::vec4(0, 0, 1, 1);
 }

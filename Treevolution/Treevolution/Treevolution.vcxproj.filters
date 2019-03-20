@@ -75,6 +75,9 @@
     <ClCompile Include="src\Scene\Raytracing\Raytracing.cpp">
       <Filter>Source Files\Scene\Raytracing</Filter>
     </ClCompile>
+    <ClCompile Include="src\GeneticAlgorithms\TreeStructure.cpp">
+      <Filter>Source Files\GeneticAlgorithms</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\OpenGL\Drawable.h">
@@ -100,6 +103,9 @@
     </ClInclude>
     <ClInclude Include="src\Globals.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GeneticAlgorithms\TreeStructure.h">
+      <Filter>Header Files\GeneticAlgorithms</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
