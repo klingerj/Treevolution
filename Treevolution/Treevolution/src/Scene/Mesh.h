@@ -75,17 +75,6 @@ public:
     Intersection Intersect(const Ray& r) const; // Intersect a single ray with this mesh
     bool Contains(const glm::vec3& p) const; // Check if a point intersects this mesh an odd number of times
 
-    // Mesh manipulation
-    void AddPositions(const std::vector<glm::vec3>& p) {
-        positions.insert(positions.end(), p.begin(), p.end());
-    }
-    void AddNormals(const std::vector<glm::vec3>& n) {
-        normals.insert(normals.end(), n.begin(), n.end());
-    }
-    void AddIndices(const std::vector<unsigned int>& i) {
-        indices.insert(indices.end(), i.begin(), i.end());
-    }
-
     // Inherited Function(s)
     void Create() override;
     GLenum DrawMode() override;

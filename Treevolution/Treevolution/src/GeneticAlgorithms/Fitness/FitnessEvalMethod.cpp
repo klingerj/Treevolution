@@ -25,6 +25,6 @@ int VolumetricFitnessEval::Evaluate() const {
     return score;
 }
 
-/*void VolumetricFitnessEval::SetReferenceGrid() {
+void VolumetricFitnessEval::SetReferenceGrid(const std::vector<Triangle>& mesh) {
     
-}*/
+}
