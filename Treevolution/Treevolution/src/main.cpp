@@ -1,6 +1,6 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
+#include "glad/glad.h"
+#include "GLFW/glfw3.h"
+#include "glm/glm.hpp"
 
 #include "OpenGL/ShaderProgram.h"
 #include "Scene/DrawableLine.h"
@@ -56,15 +56,15 @@ int main() {
     l.end = glm::vec3(0.0f, 0.5f, 0.0f);
     //lines.addLineSegment(l);
     
-	// Create L-system
-	LSystem sys;
-	sys.setDefaultStep(0.1);
-	sys.setDefaultAngle(30.0);
-	sys.loadProgramFromString("F\nF->F[+F]F[-F]F"); //taken from simple1.txt
+	  // Create L-system
+	  LSystem sys;
+	  sys.setDefaultStep(0.1);
+	  sys.setDefaultAngle(30.0);
+	  sys.loadProgramFromString("F\nF->F[+F]F[-F]F"); //taken from simple1.txt
 
-	// Run turtle
-	std::vector<LSystem::Branch> branches;
-	sys.process(2, branches);
+	  // Run turtle
+	  std::vector<LSystem::Branch> branches;
+	  sys.process(2, branches);
 
     // Load reference model
 
@@ -73,16 +73,16 @@ int main() {
 
     //eval.SetReferenceGrid(referenceTris);
 
-	// Create lines from branches
-	for (LSystem::Branch b : branches)
-	{
-		Line l;
-		l.start = b.first;
-		l.end = b.second;
-		lines.addLineSegment(l);
-	}
+	  // Create lines from branches
+	  for (LSystem::Branch b : branches)
+	  {
+	  	Line l;
+	  	l.start = b.first;
+	  	l.end = b.second;
+	  	lines.addLineSegment(l);
+	  }
 
-    lines.create();
+    lines.Create();
 
     while (!glfwWindowShouldClose(window)) {
         // Input handling

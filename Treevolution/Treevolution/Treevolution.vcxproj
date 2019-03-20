@@ -26,13 +26,18 @@
     <ClCompile Include="src\OpenGL\Drawable.cpp" />
     <ClCompile Include="src\OpenGL\ShaderProgram.cpp" />
     <ClCompile Include="src\Scene\DrawableLine.cpp" />
+    <ClCompile Include="src\Scene\Mesh.cpp" />
+    <ClCompile Include="src\Scene\Raytracing\Raytracing.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GeneticAlgorithms\Fitness\FitnessEvalMethod.h" />
+    <ClInclude Include="src\Globals.h" />
     <ClInclude Include="src\LSystem.h" />
     <ClInclude Include="src\OpenGL\Drawable.h" />
     <ClInclude Include="src\OpenGL\ShaderProgram.h" />
     <ClInclude Include="src\Scene\DrawableLine.h" />
+    <ClInclude Include="src\Scene\Mesh.h" />
+    <ClInclude Include="src\Scene\Raytracing\Raytracing.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Shaders\flat.frag" />
@@ -107,7 +112,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\Libraries\glad\include;$(SolutionDir)\..\Libraries\glfw-3.2.1\include;$(SolutionDir)\..\Libraries\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\Libraries\glad\include;$(SolutionDir)\..\Libraries\glfw-3.2.1\include;$(SolutionDir)\..\Libraries\glm;$(SolutionDir)\..\Libraries\tinyobjloader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -119,7 +124,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\Libraries\glad\include;$(SolutionDir)\..\Libraries\glfw-3.2.1\include;$(SolutionDir)\..\Libraries\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\Libraries\glad\include;$(SolutionDir)\..\Libraries\glfw-3.2.1\include;$(SolutionDir)\..\Libraries\glm;$(SolutionDir)\..\Libraries\tinyobjloader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -134,7 +139,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\Libraries\glad\include;$(SolutionDir)\..\Libraries\glfw-3.2.1\include;$(SolutionDir)\..\Libraries\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\Libraries\glad\include;$(SolutionDir)\..\Libraries\glfw-3.2.1\include;$(SolutionDir)\..\Libraries\glm;$(SolutionDir)\..\Libraries\tinyobjloader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -150,7 +155,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\Libraries\glad\include;$(SolutionDir)\..\Libraries\glfw-3.2.1\include;$(SolutionDir)\..\Libraries\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\Libraries\glad\include;$(SolutionDir)\..\Libraries\glfw-3.2.1\include;$(SolutionDir)\..\Libraries\glm;$(SolutionDir)\..\Libraries\tinyobjloader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

@@ -24,6 +24,6 @@ public:
     void genBufNor();
 
     // Inheritable functions
-    virtual void create() = 0;
-    virtual GLenum drawMode() = 0;
+    virtual void Create() = 0;
+    virtual GLenum DrawMode() = 0;
 };

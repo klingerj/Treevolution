@@ -21,6 +21,6 @@ public:
         lineSegments.push_back(l);
     }
 
-    void create() override;
-    GLenum drawMode() override;
+    void Create() override;
+    GLenum DrawMode() override;
 };

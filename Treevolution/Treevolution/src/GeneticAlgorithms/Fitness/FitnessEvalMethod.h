@@ -30,8 +30,8 @@ public:
     int Evaluate() const override;
 
     // Set the reference volumetric grid
-    void SetReferenceGrid(const std::vector<Triangle>& mesh);
+    //void SetReferenceGrid(const std::vector<Triangle>& mesh);
 
     // Set the current volumetric grid
-    void SetCurrentGrid(const std::vector<Triangle>& mesh);
+    //void SetCurrentGrid(const std::vector<Triangle>& mesh);
 };

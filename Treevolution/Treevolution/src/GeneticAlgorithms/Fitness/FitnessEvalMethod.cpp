@@ -4,9 +4,10 @@ FitnessEvalMethod::FitnessEvalMethod() {}
 FitnessEvalMethod::~FitnessEvalMethod() {}
 
 VolumetricFitnessEval::VolumetricFitnessEval(const glm::vec3& gridDim) {
-    gridReference = new uint8_t[gridDim.x * gridDim.y * gridDim.z];
-    gridCurrent = new uint8_t[gridDim.x * gridDim.y * gridDim.z];
+    gridReference = new uint8_t[(int)(gridDim.x * gridDim.y * gridDim.z)];
+    gridCurrent = new uint8_t[(int)(gridDim.x * gridDim.y * gridDim.z)];
 }
+
 VolumetricFitnessEval::~VolumetricFitnessEval() {
     if (gridReference) {
         delete gridReference;
@@ -24,6 +25,6 @@ int VolumetricFitnessEval::Evaluate() const {
     return score;
 }
 
-void SetReferenceGrid() {
+/*void VolumetricFitnessEval::SetReferenceGrid() {
     
-}
+}*/

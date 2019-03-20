@@ -4,7 +4,7 @@ DrawableLine::DrawableLine() : Drawable(), lineSegments() {}
 
 DrawableLine::~DrawableLine() {}
 
-void DrawableLine::create() {
+void DrawableLine::Create() {
     // Indices
     genBufIdx();
 
@@ -31,6 +31,6 @@ void DrawableLine::create() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * lineData.size(), lineData.data(), GL_STATIC_DRAW);
 }
 
-GLenum DrawableLine::drawMode() {
+GLenum DrawableLine::DrawMode() {
     return GL_LINES;
 }
