@@ -102,7 +102,7 @@ void ShaderProgram::Draw(Drawable& d) {
     }
 
     d.bindBufIdx();
-    glDrawElements(d.drawMode(), d.idxCount(), GL_UNSIGNED_INT, 0);
+    glDrawElements(d.DrawMode(), d.idxCount(), GL_UNSIGNED_INT, 0);
 
     if (attrPos != -1) { glDisableVertexAttribArray(attrPos); }
     if (attrNor != -1) { glDisableVertexAttribArray(attrNor); }
