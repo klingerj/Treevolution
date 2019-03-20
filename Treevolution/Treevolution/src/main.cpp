@@ -5,6 +5,7 @@
 #include "OpenGL/ShaderProgram.h"
 #include "Scene/DrawableLine.h"
 #include "LSystem.h"
+#include "GeneticAlgorithms/Fitness/FitnessEvalMethod.h"
 
 #include <iostream>
 
@@ -64,7 +65,12 @@ int main() {
 	// Run turtle
 	std::vector<LSystem::Branch> branches;
 	std::vector<LSystem::Geometry> models;
-	sys.process(2, branches, models); 
+	sys.process(2, branches, models);
+
+  // Volumetric fitness evaluation
+  FitnessEvalMethod* eval = new VolumetricFitnessEval({ 10, 10, 10 });
+
+  //eval.SetReferenceGrid(referenceTris);
 
 	// Create lines from branches
 	for (LSystem::Branch b : branches)
