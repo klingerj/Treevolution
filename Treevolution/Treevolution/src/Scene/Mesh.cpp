@@ -1,6 +1,6 @@
 #include "Mesh.h"
 
-#define TINYOBJLOADER_IMPLEMENTATION 
+#define TINYOBJLOADER_IMPLEMENTATION
 #include "../tinyobjloader/tiny_obj_loader.h"
 
 #include <iostream>
@@ -14,8 +14,9 @@ void Mesh::LoadFromFile(const char* filepath) {
     std::vector<tinyobj::shape_t> shapes;
     std::vector<tinyobj::material_t> materials;
 
+    std::string warn;
     std::string err;
-    bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, filepath);
+    bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filepath);
 
     if (!err.empty()) { // `err` may contain warning message
         std::cerr << err << std::endl;

@@ -6,6 +6,7 @@
 #include "Scene/DrawableLine.h"
 #include "LSystem.h"
 #include "GeneticAlgorithms/Fitness/FitnessEvalMethod.h"
+#include "Scene/Mesh.h"
 
 #include <iostream>
 
@@ -58,8 +59,8 @@ int main() {
     
 	  // Create L-system
 	  LSystem sys;
-	  sys.setDefaultStep(0.1);
-	  sys.setDefaultAngle(30.0);
+	  sys.setDefaultStep(0.1f);
+	  sys.setDefaultAngle(30.0f);
 	  sys.loadProgramFromString("F\nF->F[+F]F[-F]F"); //taken from simple1.txt
 
 	  // Run turtle
@@ -67,11 +68,14 @@ int main() {
 	  sys.process(2, branches);
 
     // Load reference model
+    Mesh referenceMesh = Mesh();
+    referenceMesh.LoadFromFile("res/models.cube.obj");
+    const std::vector<Triangle>& referenceTris = referenceMesh.GetTriangles();
 
     // Volumetric fitness evaluation
     FitnessEvalMethod* eval = new VolumetricFitnessEval({ 10, 10, 10 });
+    dynamic_cast<VolumetricFitnessEval*>(eval)->SetReferenceGrid(referenceTris);
 
-    //eval.SetReferenceGrid(referenceTris);
 
 	  // Create lines from branches
 	  for (LSystem::Branch b : branches)
