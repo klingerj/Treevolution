@@ -53,7 +53,7 @@ const std::string& LSystem::getIteration(unsigned int n)
         {
             current = iterate(current);
             iterations.push_back(current);
-        }        
+        }
     }
     return iterations[n];
 }
@@ -68,7 +68,7 @@ void LSystem::loadProgram(const std::string& fileName)
     {
         while (file.good())
         {
-            getline(file,line);
+            getline(file, line);
             addProduction(line);
         }
     }
@@ -78,7 +78,7 @@ void LSystem::loadProgram(const std::string& fileName)
 
 void LSystem::loadProgramFromString(const std::string& program)
 {
-    reset(); 
+    reset();
     mGrammar = program;
 
     size_t index = 0;
@@ -88,7 +88,7 @@ void LSystem::loadProgramFromString(const std::string& program)
         std::string line = program.substr(index, nextIndex);
         addProduction(line);
         if (nextIndex == std::string::npos) break;
-        index = nextIndex+1;
+        index = nextIndex + 1;
     }
 }
 
@@ -99,7 +99,7 @@ void LSystem::addProduction(std::string line)
     // 1. Strip whitespace
     while ((index = line.find(" ")) != std::string::npos)
     {
-        line.replace(index, 1, ""); 
+        line.replace(index, 1, "");
     }
 
     if (line.size() == 0) return;
@@ -109,7 +109,7 @@ void LSystem::addProduction(std::string line)
     if (index != std::string::npos)
     {
         std::string symFrom = line.substr(0, index);
-        std::string symTo = line.substr(index+2);
+        std::string symTo = line.substr(index + 2);
         productions[symFrom] = symTo;
     }
     else  // assume its the start sym
@@ -123,8 +123,8 @@ std::string LSystem::iterate(const std::string& input)
     std::string output = "";
     for (unsigned int i = 0; i < input.size(); i++)
     {
-        std::string sym = input.substr(i,1);
-        std::string next = productions.count(sym) > 0? productions[sym] : sym; 
+        std::string sym = input.substr(i, 1);
+        std::string next = productions.count(sym) > 0 ? productions[sym] : sym;
         output = output + next;
     }
     return output;
@@ -133,10 +133,10 @@ std::string LSystem::iterate(const std::string& input)
 
 
 LSystem::Turtle::Turtle() :
-    pos(0,0,0),
-    up(0,0,1,1),
-    forward(1,0,0,1),
-    left(0,1,0,1)
+    pos(0, 0, 0),
+    up(0, 0, 1, 1),
+    forward(1, 0, 0, 1),
+    left(0, 1, 0, 1)
 {
 }
 
@@ -166,32 +166,32 @@ void LSystem::Turtle::moveForward(float length)
 
 void LSystem::Turtle::applyUpRot(float degrees)
 {
-	glm::mat4 mat = glm::rotate(glm::mat4(1.0), float(Deg2Rad*degrees), glm::vec3(0, 0, 1)); // Z axis
-    glm::mat4 world2local = glm::mat4(forward, left, up, glm::vec4(0.0)); 
-    up =  world2local * mat * glm::vec4(0,0,1,1);
-    left = world2local * mat * glm::vec4(0,1,0,1);
-    forward = world2local * mat * glm::vec4(1,0,0,1);
+    glm::mat4 mat = glm::rotate(glm::mat4(1.0), float(Deg2Rad*degrees), glm::vec3(0, 0, 1)); // Z axis
+    glm::mat4 world2local = glm::mat4(forward, left, up, glm::vec4(0.0));
+    up = world2local * mat * glm::vec4(0, 0, 1, 1);
+    left = world2local * mat * glm::vec4(0, 1, 0, 1);
+    forward = world2local * mat * glm::vec4(1, 0, 0, 1);
 }
 
 void LSystem::Turtle::applyLeftRot(float degrees)
 {
-	glm::mat4 mat = glm::rotate(glm::mat4(1.0), float(Deg2Rad*degrees), glm::vec3(0, 1, 0)); // Y axis
-	glm::mat4 world2local = glm::mat4(forward, left, up, glm::vec4(0.0));
-	up = world2local * mat * glm::vec4(0, 0, 1, 1);
-	left = world2local * mat * glm::vec4(0, 1, 0, 1);
-	forward = world2local * mat * glm::vec4(1, 0, 0, 1);
+    glm::mat4 mat = glm::rotate(glm::mat4(1.0), float(Deg2Rad*degrees), glm::vec3(0, 1, 0)); // Y axis
+    glm::mat4 world2local = glm::mat4(forward, left, up, glm::vec4(0.0));
+    up = world2local * mat * glm::vec4(0, 0, 1, 1);
+    left = world2local * mat * glm::vec4(0, 1, 0, 1);
+    forward = world2local * mat * glm::vec4(1, 0, 0, 1);
 }
 
 void LSystem::Turtle::applyForwardRot(float degrees)
 {
-	glm::mat4 mat = glm::rotate(glm::mat4(1.0), float(Deg2Rad*degrees), glm::vec3(1, 0, 0)); // X axis
-	glm::mat4 world2local = glm::mat4(forward, left, up, glm::vec4(0.0));
-	up = world2local * mat * glm::vec4(0, 0, 1, 1);
-	left = world2local * mat * glm::vec4(0, 1, 0, 1);
-	forward = world2local * mat * glm::vec4(1, 0, 0, 1);
+    glm::mat4 mat = glm::rotate(glm::mat4(1.0), float(Deg2Rad*degrees), glm::vec3(1, 0, 0)); // X axis
+    glm::mat4 world2local = glm::mat4(forward, left, up, glm::vec4(0.0));
+    up = world2local * mat * glm::vec4(0, 0, 1, 1);
+    left = world2local * mat * glm::vec4(0, 1, 0, 1);
+    forward = world2local * mat * glm::vec4(1, 0, 0, 1);
 }
 
-void LSystem::process(unsigned int n, 
+void LSystem::process(unsigned int n,
     std::vector<Branch>& branches)
 {
     Turtle turtle;
@@ -207,12 +207,12 @@ void LSystem::process(unsigned int n,
 
     for (unsigned int i = 0; i < insn.size(); i++)
     {
-        std::string sym = insn.substr(i,1);
+        std::string sym = insn.substr(i, 1);
         if (sym == "F")
         {
             glm::vec3 start = turtle.pos;
             turtle.moveForward(mDfltStep);
-            branches.push_back(Branch(start,turtle.pos));
+            branches.push_back(Branch(start, turtle.pos));
         }
         else if (sym == "f")
         {

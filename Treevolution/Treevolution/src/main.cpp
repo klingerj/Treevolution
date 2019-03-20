@@ -71,7 +71,7 @@ int main() {
     // Volumetric fitness evaluation
     FitnessEvalMethod* eval = new VolumetricFitnessEval({ 10, 10, 10 });
 
-    eval.SetReferenceGrid(referenceTris);
+    //eval.SetReferenceGrid(referenceTris);
 
 	// Create lines from branches
 	for (LSystem::Branch b : branches)

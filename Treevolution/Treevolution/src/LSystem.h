@@ -6,8 +6,7 @@
 #include <map>
 #include <glm/glm.hpp>
 
-class LSystem
-{
+class LSystem {
 public:
     typedef std::pair<glm::vec3, glm::vec3> Branch;
 
@@ -29,14 +28,14 @@ public:
     const std::string& getIteration(unsigned int n);
 
     // Get geometry from running the turtle
-    void process(unsigned int n, 
+    void process(unsigned int n,
         std::vector<Branch>& branches);
 
 protected:
     void reset();
     void addProduction(std::string line);
     std::string iterate(const std::string& input);
-    
+
     std::map<std::string, std::string> productions;
     std::vector<std::string> iterations;
     std::vector<Branch> bboxes;
