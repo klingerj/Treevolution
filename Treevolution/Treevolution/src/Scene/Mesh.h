@@ -25,6 +25,12 @@ public:
     void AppendVertex(const glm::vec3& p) {
         points.emplace_back(p);
     }
+    std::vector<glm::vec3> GetPoints() {
+        return points;
+    }
+    glm::vec3 GetNormal() {
+        return planeNormal;
+    }
     Intersection Intersect(const Ray& r) const;
     inline void ComputePlaneNormal() { planeNormal = glm::normalize(glm::cross(points[1] - points[0], points[2] - points[1])); }
 };
@@ -67,6 +73,7 @@ public:
     const std::vector<unsigned int>& GetIndices()   const { return indices; }
 
     // Setters
+    void SetTriangles(std::vector<Triangle>& t);
     void SetPositions(std::vector<glm::vec3>& p) { positions = p; }
     void SetNormals(std::vector<glm::vec3>& n) { normals = n; }
     void SetIndices(std::vector<unsigned int>& i) { indices = i; }
