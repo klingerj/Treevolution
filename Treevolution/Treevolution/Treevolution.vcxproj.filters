@@ -51,9 +51,6 @@
     <ClCompile Include="..\..\Libraries\glad\src\glad.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\OpenGL\Drawable.cpp">
-      <Filter>Source Files\OpenGL</Filter>
-    </ClCompile>
     <ClCompile Include="src\OpenGL\ShaderProgram.cpp">
       <Filter>Source Files\OpenGL</Filter>
     </ClCompile>
@@ -77,6 +74,12 @@
     </ClCompile>
     <ClCompile Include="src\Scene\Camera.cpp">
       <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GeneticAlgorithms\TreeStructure.cpp">
+      <Filter>Source Files\GeneticAlgorithms</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OpenGL\Drawable.cpp">
+      <Filter>Source Files\OpenGL</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -106,6 +109,9 @@
     </ClInclude>
     <ClInclude Include="src\Scene\Camera.h">
       <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GeneticAlgorithms\TreeStructure.h">
+      <Filter>Header Files\GeneticAlgorithms</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

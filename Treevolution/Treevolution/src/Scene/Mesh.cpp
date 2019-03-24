@@ -65,6 +65,36 @@ void Mesh::LoadFromFile(const char* filepath) {
     return;
 }
 
+void Mesh::SetTriangles(std::vector<Triangle>& t)
+{
+    triangles = t;
+
+    // Loop over triangles
+    size_t index_offset = 0;
+    for (size_t f = 0; f < triangles.size(); ++f) {
+        
+        Triangle tr = triangles[f];
+        tr.ComputePlaneNormal();
+        std::vector<glm::vec3> trPts = tr.GetPoints();
+
+        // Loop over vertices in the face
+        for (size_t v = 0; v < 3; ++v) {
+
+            const unsigned int index = (unsigned int)(index_offset + v);
+            Vertex newVert;
+            newVert.pos = trPts[v];
+            newVert.nor = tr.GetNormal();
+
+            // Store data
+            vertices.emplace_back(newVert);
+            indices.emplace_back(index);
+            positions.emplace_back(newVert.pos);
+            normals.emplace_back(newVert.nor);
+        }
+        index_offset += 3;
+    }
+}
+
 Intersection Triangle::Intersect(const Ray& r) const {
     // 1. Ray-plane intersection
     const float t = glm::dot(planeNormal, (points[0] - r.GetOrigin())) / glm::dot(planeNormal, r.GetDirection());
