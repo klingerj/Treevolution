@@ -19,7 +19,7 @@ private:
     float aspect; // aspect ratio
 public:
     Camera(const glm::vec3 e, const glm::vec3& r, const float fov, const float a, const float n, const float f) :
-        eye(e), ref(r), fovy(fov), aspect(a), nearPlane(n), farPlane(f), look(0, 0, -1), right(0, 0, 1), up(0, 1, 0) {
+        eye(e), ref(r), fovy(fov), aspect(a), nearPlane(n), farPlane(f), look(0, 0, -1), right(1, 0, 0), up(0, 1, 0) {
         UpdateAttributes();
     }
     ~Camera() {}

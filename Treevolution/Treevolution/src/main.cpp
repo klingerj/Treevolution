@@ -6,6 +6,7 @@
 #include "Scene/DrawableLine.h"
 #include "LSystem.h"
 #include "GeneticAlgorithms/Fitness/FitnessEvalMethod.h"
+#include "GeneticAlgorithms/TreeStructure.h"
 #include "Scene/Mesh.h"
 #include "Scene/Camera.h"
 
@@ -32,6 +33,12 @@ void processInput(GLFWwindow *window) {
     else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
         camera.TranslateAlongLook(-camMoveSensitivity);
     }
+    else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+        camera.TranslateAlongRight(-camMoveSensitivity * 0.2f);
+    }
+    else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+        camera.TranslateAlongRight(camMoveSensitivity * 0.2f);
+    }
     else if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
         camera.RotateAboutRight(-camMoveSensitivity * 0.2f);
     }
@@ -39,10 +46,10 @@ void processInput(GLFWwindow *window) {
         camera.RotateAboutRight(camMoveSensitivity * 0.2f);
     }
     else if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-        camera.RotateAboutUp(-camMoveSensitivity * 0.2f);
+        camera.RotateAboutUp(camMoveSensitivity * 0.2f);
     }
     else if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-        camera.RotateAboutUp(camMoveSensitivity * 0.2f);
+        camera.RotateAboutUp(-camMoveSensitivity * 0.2f);
     }
     else if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
         camera.TranslateAlongUp(-camMoveSensitivity);
@@ -83,41 +90,50 @@ int main() {
     glBindVertexArray(VAO);
 
     // Scene data
-    DrawableLine lines = DrawableLine();
-    Line l;
-    l.start = glm::vec3(0.0f, 0.0f, 0.0f);
-    l.end = glm::vec3(0.0f, 0.5f, 0.0f);
+    //DrawableLine lines = DrawableLine();
+    //Line l;
+    //l.start = glm::vec3(0.0f, 0.0f, 0.0f);
+    //l.end = glm::vec3(0.0f, 0.5f, 0.0f);
     //lines.addLineSegment(l);
     
+    // Load base branch model
+    Mesh branchMesh = Mesh();
+    branchMesh.LoadFromFile("res/models/cube.obj");
+
 	  // Create L-system
 	  LSystem sys;
 	  sys.setDefaultStep(0.1f);
 	  sys.setDefaultAngle(30.0f);
 	  sys.loadProgramFromString("F\nF->F[+F]F[-F]F"); //taken from simple1.txt
+    std::string iteratedStr = sys.getIteration(0);
+
+    TreeStructure theTree = TreeStructure(iteratedStr, -90.0f, 90.0f, 1.0f, 3.0f);
+    Mesh treeMesh = theTree.GetTreeMesh(branchMesh);
+    treeMesh.Create();
 
 	  // Run turtle
-	  std::vector<LSystem::Branch> branches;
-	  sys.process(2, branches);
+	  //std::vector<LSystem::Branch> branches;
+	  //sys.process(2, branches);
 
     // Load reference model
-    //Mesh referenceMesh = Mesh();
-    //referenceMesh.LoadFromFile("res/models/cube.obj");
+    Mesh referenceMesh = Mesh();
+    referenceMesh.LoadFromFile("res/models/cube.obj");
 
     // Volumetric fitness evaluation
-    //FitnessEvalMethod* eval = new VolumetricFitnessEval(0.1f);
-    //dynamic_cast<VolumetricFitnessEval*>(eval)->SetGrids(referenceMesh);
+    FitnessEvalMethod* eval = new VolumetricFitnessEval(0.1f);
+    dynamic_cast<VolumetricFitnessEval*>(eval)->SetGrids(referenceMesh);
+    // TODO: better way to do this other than dynamic casting?
 
 
 	  // Create lines from branches
-	  for (LSystem::Branch b : branches)
+	  /*for (LSystem::Branch b : branches)
 	  {
 	  	Line l;
 	  	l.start = b.first;
 	  	l.end = b.second;
 	  	lines.addLineSegment(l);
 	  }
-
-    lines.Create();
+    lines.Create();*/
 
     while (!glfwWindowShouldClose(window)) {
         // Input handling
@@ -129,7 +145,7 @@ int main() {
 
         // Draw the scene
         flatShader.setCameraViewProj("cameraViewProj", camera.GetViewProj());
-        flatShader.Draw(lines);
+        flatShader.Draw(treeMesh);
 
         // Check/call events, swap buffers
         glfwPollEvents();
@@ -138,7 +154,9 @@ int main() {
 
     // Cleanup
     glDeleteVertexArrays(1, &VAO);
-    lines.destroy();
+    //lines.destroy();
+    //referenceMesh.destroy();
+    treeMesh.destroy();
     glfwTerminate();
 
     exit(EXIT_SUCCESS);

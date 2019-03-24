@@ -23,11 +23,7 @@ TreeStructure::TreeStructure(std::string gram, float minAngle, float maxAngle,
     float minLen, float maxLen) : mGrammar(gram), mMinAngle(minAngle), mMaxAngle(maxAngle),
     mMinLen(minLen), mMaxLen(maxLen), mRoot(nullptr)
 {
-    mRoot = new TreeNode[25];
-    for (int i = 0; i < 25; ++i)
-    {
-        mRoot[i] = TreeNode();
-    }
+    mRoot = new TreeNode();
 
     ConstructTree(mRoot, gram);
 
@@ -38,21 +34,21 @@ TreeStructure::TreeStructure(std::string gram, float minAngle, float maxAngle,
 
 void TreeStructure::ConstructTree(TreeNode *root, std::string substring)
 {
-    while (substring.length() != 0)
+    if (substring.length() != 0)
     {
         char sym = substring.at(0);
 
-        if (sym == 'F' || sym == '-')
+        if (sym == 'F' || sym == '-' || sym == '+')
         {
             TreeNode* next = AddChildToNode(root, sym);
             ConstructTree(next, substring.substr(1, substring.length() - 1));
         }
-        if (sym == '[')
+        else if (sym == '[')
         {
             nodeStack.push(root);
             ConstructTree(root, substring.substr(1, substring.length() - 1));
         }
-        if (sym == ']')
+        else if (sym == ']')
         {
             TreeNode* returnNode = nodeStack.top();
             nodeStack.pop();
@@ -61,44 +57,37 @@ void TreeStructure::ConstructTree(TreeNode *root, std::string substring)
     }
 }
 
-TreeNode* TreeStructure::GetNextFreeNode()
-{
-    for (int i = 0; i < 25; ++i)
-    {
-        if (mRoot[i].GetName() == 0) {
-            return mRoot + i;
-        }
-    }
-
-    // TODO allocate a new linked list
-}
-
 TreeNode* TreeStructure::AddChildToNode(TreeNode* parent, char c) 
 {
-    TreeNode* freeNode = GetNextFreeNode();
+    TreeNode* newNode = new TreeNode();
 
     float p = 0.f;
     if (c == 'F')
     {
         // generate random float between mMinLen and mMaxLen 
         p = (float(std::rand()) / RAND_MAX) * (mMaxLen - mMinLen) + mMinLen;
-        (*freeNode) = TreeNode(c, p);
+        p = 1.0f;
+        (*newNode) = TreeNode(c, p);
     }
-    else if (c == '-')
+    else if (c == '-' || c == '+')
     {
         // generate three random numbers for axis and a random number for angle val
         float x = (float(std::rand()) / RAND_MAX) * 2 - 1;
         float y = (float(std::rand()) / RAND_MAX) * 2 - 1;
         float z = (float(std::rand()) / RAND_MAX) * 2 - 1;
         glm::vec3 a(x, y, z);
+        a = glm::normalize(a);
+
+        a = glm::vec3(0, 0, 1);
 
         p = (float(std::rand()) / RAND_MAX) * (mMaxAngle - mMinAngle) + mMinAngle;
-        (*freeNode) = TreeNode(c, p, a);
+        p = 45.0f;
+        (*newNode) = TreeNode(c, p, a);
     }
 
-    parent->children.push_back(freeNode);
+    parent->children.push_back(newNode);
 
-    return freeNode;
+    return newNode;
 }
 
 void TreeStructure::processNode(TreeNode* currNode, Mesh &baseMesh)
@@ -108,17 +97,17 @@ void TreeStructure::processNode(TreeNode* currNode, Mesh &baseMesh)
     {
         // store current position then find the next position
         glm::vec3 startPos = currTurtle.pos;
-        currTurtle.moveForward(currNode->param);
+        currTurtle.moveForward(/*currNode->param*/1.0f);
         glm::vec3 endPos = currTurtle.pos;
 
         // find the scale and translation of the branch geometry
-        float halfDist = glm::length(endPos - startPos) / 2.f;
-        glm::mat4 scale = glm::scale(glm::mat4(1.0), glm::vec3(1.f, halfDist, 1.f));
-        glm::mat4 trans = glm::translate(glm::mat4(1.0), ((endPos - startPos) / 2.f));
+        float halfDist = glm::length(endPos - startPos) * 0.5f;
+        glm::mat4 scale = glm::scale(glm::mat4(1.0), glm::vec3(0.05f, halfDist, 0.05f));
+        glm::mat4 trans = glm::translate(glm::mat4(1.0), ((endPos - startPos) * 0.5f));
 
         // find the rotation of the branch geometry
-        glm::mat4 rot = glm::mat4(currTurtle.left, currTurtle.up, 
-            currTurtle.forward, glm::vec4(0.0));
+        glm::mat4 rot = glm::mat4(currTurtle.left, currTurtle.up,
+            currTurtle.forward, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
         // create a transormation matrix
         glm::mat4 transform = trans * rot * scale;
@@ -137,11 +126,11 @@ void TreeStructure::processNode(TreeNode* currNode, Mesh &baseMesh)
             tris.push_back(newT);
         }
     }
-    else if (currNode->name == '-')
+    else if (currNode->name == '-' || currNode->name == '+')
     {
         currTurtle.applyRot(currNode->axis, currNode->param);
     }
-
+    
     for (TreeNode* child : currNode->children)
     {
         // begin new branch
@@ -167,7 +156,7 @@ Mesh TreeStructure::GetTreeMesh(Mesh &baseMesh)
     
     Mesh output;
 
-    //processNode(mRoot, cubeboi);
+    processNode(mRoot, baseMesh);
 
     // set tris to traingles of this mesh
     output.SetTriangles(tris);
