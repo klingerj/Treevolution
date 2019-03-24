@@ -24,15 +24,17 @@ private:
     // The grid containing volumetric info of the current procedural model
     uint8_t* gridCurrent;
 
+    float gridCellSize;
+
 public:
-    VolumetricFitnessEval(const glm::vec3& gridDim);
+    VolumetricFitnessEval(float gridCellSize);
     ~VolumetricFitnessEval();
 
     // Returns the evaluated fitness score.
     int Evaluate() const override;
 
     // Set the reference volumetric grid
-    void SetReferenceGrid(const std::vector<Triangle>& mesh);
+    void SetGrids(const Mesh& mesh);
 
     // Set the current volumetric grid
     //void SetCurrentGrid(const std::vector<Triangle>& mesh);

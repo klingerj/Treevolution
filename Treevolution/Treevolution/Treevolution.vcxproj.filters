@@ -75,6 +75,9 @@
     <ClCompile Include="src\Scene\Raytracing\Raytracing.cpp">
       <Filter>Source Files\Scene\Raytracing</Filter>
     </ClCompile>
+    <ClCompile Include="src\Scene\Camera.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\OpenGL\Drawable.h">
@@ -100,6 +103,9 @@
     </ClInclude>
     <ClInclude Include="src\Globals.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scene\Camera.h">
+      <Filter>Header Files\Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

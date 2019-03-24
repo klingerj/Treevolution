@@ -112,8 +112,3 @@ void ShaderProgram::setCameraViewProj(const char* uniformName, const glm::mat4& 
     use();
     glUniformMatrix4fv(glGetUniformLocation(ID, uniformName), 1, GL_FALSE, glm::value_ptr(camViewProj));
 }
-
-void ShaderProgram::setUniformColor(const char* uniformName, const glm::vec3& color) {
-    use();
-    glUniform3fv(glGetUniformLocation(ID, uniformName), 1, glm::value_ptr(color));
-}
