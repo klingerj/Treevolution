@@ -104,8 +104,8 @@ int main() {
 	  LSystem sys;
 	  sys.setDefaultStep(0.1f);
 	  sys.setDefaultAngle(30.0f);
-	  sys.loadProgramFromString("F\nF->F[+F]F[-F]F"); //taken from simple1.txt
-    std::string iteratedStr = sys.getIteration(0);
+	  sys.loadProgramFromString("F\nF->F[+F][-F]"); //taken from simple1.txt
+    std::string iteratedStr = sys.getIteration(2);
 
     TreeStructure theTree = TreeStructure(iteratedStr, -90.0f, 90.0f, 1.0f, 3.0f);
     Mesh treeMesh = theTree.GetTreeMesh(branchMesh);

@@ -69,7 +69,7 @@ TreeNode* TreeStructure::AddChildToNode(TreeNode* parent, char c)
         p = 1.0f;
         (*newNode) = TreeNode(c, p);
     }
-    else if (c == '-' || c == '+')
+    else if (c == '-')
     {
         // generate three random numbers for axis and a random number for angle val
         float x = (float(std::rand()) / RAND_MAX) * 2 - 1;
@@ -78,7 +78,22 @@ TreeNode* TreeStructure::AddChildToNode(TreeNode* parent, char c)
         glm::vec3 a(x, y, z);
         a = glm::normalize(a);
 
-        a = glm::vec3(0, 0, 1);
+        a = glm::vec3(1, 0, 0);
+
+        p = (float(std::rand()) / RAND_MAX) * (mMaxAngle - mMinAngle) + mMinAngle;
+        p = -45.0f;
+        (*newNode) = TreeNode(c, p, a);
+    }
+    else if (c == '+')
+    {
+        // generate three random numbers for axis and a random number for angle val
+        float x = (float(std::rand()) / RAND_MAX) * 2 - 1;
+        float y = (float(std::rand()) / RAND_MAX) * 2 - 1;
+        float z = (float(std::rand()) / RAND_MAX) * 2 - 1;
+        glm::vec3 a(x, y, z);
+        a = glm::normalize(a);
+
+        a = glm::vec3(1, 0, 0);
 
         p = (float(std::rand()) / RAND_MAX) * (mMaxAngle - mMinAngle) + mMinAngle;
         p = 45.0f;
@@ -97,20 +112,23 @@ void TreeStructure::processNode(TreeNode* currNode, Mesh &baseMesh)
     {
         // store current position then find the next position
         glm::vec3 startPos = currTurtle.pos;
-        currTurtle.moveForward(/*currNode->param*/1.0f);
+        currTurtle.moveForward(currNode->param);
         glm::vec3 endPos = currTurtle.pos;
 
         // find the scale and translation of the branch geometry
-        float halfDist = glm::length(endPos - startPos) * 0.5f;
-        glm::mat4 scale = glm::scale(glm::mat4(1.0), glm::vec3(0.05f, halfDist, 0.05f));
-        glm::mat4 trans = glm::translate(glm::mat4(1.0), ((endPos - startPos) * 0.5f));
+        const float dist = glm::length(endPos - startPos);
+        const glm::mat4 scale = glm::scale(glm::mat4(1.0), glm::vec3(0.05f, dist, 0.05f));
+        // pretend z is y
+        const glm::vec3 newStart = glm::vec3(startPos.x, startPos.z, startPos.y);
+        const glm::vec3 newEnd = glm::vec3(endPos.x, endPos.z, endPos.y);
+        const glm::mat4 trans = glm::translate(glm::mat4(1.0), (newEnd - newStart) * 0.5f + newStart);
 
         // find the rotation of the branch geometry
-        glm::mat4 rot = glm::mat4(currTurtle.left, currTurtle.up,
-            currTurtle.forward, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+        const glm::mat4 rot = glm::mat4(currTurtle.left, currTurtle.forward,
+            currTurtle.up, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
         // create a transormation matrix
-        glm::mat4 transform = trans * rot * scale;
+        const glm::mat4 transform = trans * rot * scale;
 
         // add all the triangles of baseMesh modified by this matrix to tris
         std::vector<Triangle> origTris = baseMesh.GetTriangles();
