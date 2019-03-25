@@ -45,8 +45,11 @@ private:
     std::vector<glm::vec3> positions;
     std::vector<glm::vec3> normals;
     std::vector<unsigned int> indices;
+    // Extra info
+    glm::vec3 minPoint;
+    glm::vec3 maxPoint;
 public:
-    Mesh() : filename("") {
+    Mesh() : filename(""), minPoint(FLT_MAX), maxPoint(-FLT_MAX) {
         triangles = std::vector<Triangle>();
         vertices = std::vector<Vertex>();
         positions = std::vector<glm::vec3>();
@@ -77,6 +80,9 @@ public:
     void SetPositions(std::vector<glm::vec3>& p) { positions = p; }
     void SetNormals(std::vector<glm::vec3>& n) { normals = n; }
     void SetIndices(std::vector<unsigned int>& i) { indices = i; }
+
+    const glm::vec3& GetMinPos() const { return minPoint; }
+    const glm::vec3& GetMaxPos() const { return maxPoint; }
 
     // Raytracing functions
     Intersection Intersect(const Ray& r) const; // Intersect a single ray with this mesh

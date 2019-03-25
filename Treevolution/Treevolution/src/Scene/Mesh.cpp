@@ -4,11 +4,11 @@
 #include "../tinyobjloader/tiny_obj_loader.h"
 
 #include <iostream>
+#include <algorithm>
 
 void Mesh::LoadFromFile(const char* filepath) {
     filename = std::string(filepath, 0, 100); // max 100 characters for internal file name
-    filename = filename.substr(5, filename.size()); // trim the "OBJs/"
-    std::cout << filename << std::endl;
+    filename = filename.substr(11, filename.size()); // trim the "OBJs/"
 
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
@@ -42,6 +42,13 @@ void Mesh::LoadFromFile(const char* filepath) {
                 Vertex newVert;
                 newVert.pos = { attrib.vertices[3 * idx.vertex_index], attrib.vertices[3 * idx.vertex_index + 1], attrib.vertices[3 * idx.vertex_index + 2] };
                 newVert.nor = { attrib.normals[3 * idx.normal_index], attrib.normals[3 * idx.normal_index + 1], attrib.normals[3 * idx.normal_index + 2] };
+
+                minPoint.x = std::min(minPoint.x, newVert.pos.x);
+                minPoint.y = std::min(minPoint.y, newVert.pos.y);
+                minPoint.z = std::min(minPoint.z, newVert.pos.z);
+                maxPoint.x = std::max(maxPoint.x, newVert.pos.x);
+                maxPoint.y = std::max(maxPoint.y, newVert.pos.y);
+                maxPoint.z = std::max(maxPoint.z, newVert.pos.z);
 
                 // Store data
                 vertices.emplace_back(newVert);

@@ -34,9 +34,9 @@ public:
     // Get geometry from running the turtle
     Mesh GetTreeMesh(Mesh &branch);
 
-    TreeNode* GetNextFreeNode();
-
     TreeNode* AddChildToNode(TreeNode* parent, char c);
+
+    // TODO: Free all heap-allocated tree nodes
 
 private: 
     void ConstructTree(TreeNode *root, std::string substring);

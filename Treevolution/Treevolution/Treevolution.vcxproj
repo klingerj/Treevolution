@@ -26,6 +26,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\OpenGL\Drawable.cpp" />
     <ClCompile Include="src\OpenGL\ShaderProgram.cpp" />
+    <ClCompile Include="src\Scene\Camera.cpp" />
     <ClCompile Include="src\Scene\DrawableLine.cpp" />
     <ClCompile Include="src\Scene\Mesh.cpp" />
     <ClCompile Include="src\Scene\Raytracing\Raytracing.cpp" />
@@ -37,6 +38,7 @@
     <ClInclude Include="src\LSystem.h" />
     <ClInclude Include="src\OpenGL\Drawable.h" />
     <ClInclude Include="src\OpenGL\ShaderProgram.h" />
+    <ClInclude Include="src\Scene\Camera.h" />
     <ClInclude Include="src\Scene\DrawableLine.h" />
     <ClInclude Include="src\Scene\Mesh.h" />
     <ClInclude Include="src\Scene\Raytracing\Raytracing.h" />
@@ -131,7 +133,6 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
