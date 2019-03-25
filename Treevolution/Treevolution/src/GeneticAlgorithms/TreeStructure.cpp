@@ -78,7 +78,7 @@ TreeNode* TreeStructure::AddChildToNode(TreeNode* parent, char c)
         glm::vec3 a(x, y, z);
         a = glm::normalize(a);
 
-        a = glm::vec3(1, 0, 0);
+        a = glm::vec3(0, 0, 1);
 
         p = (float(std::rand()) / RAND_MAX) * (mMaxAngle - mMinAngle) + mMinAngle;
         p = -45.0f;
@@ -93,7 +93,7 @@ TreeNode* TreeStructure::AddChildToNode(TreeNode* parent, char c)
         glm::vec3 a(x, y, z);
         a = glm::normalize(a);
 
-        a = glm::vec3(1, 0, 0);
+        a = glm::vec3(0, 0, 1);
 
         p = (float(std::rand()) / RAND_MAX) * (mMaxAngle - mMinAngle) + mMinAngle;
         p = 45.0f;
@@ -116,16 +116,17 @@ void TreeStructure::processNode(TreeNode* currNode, Mesh &baseMesh)
         glm::vec3 endPos = currTurtle.pos;
 
         // find the scale and translation of the branch geometry
-        const float dist = glm::length(endPos - startPos);
+        //const float dist = glm::length(endPos - startPos);
+        const float dist = glm::length(startPos - endPos);
         const glm::mat4 scale = glm::scale(glm::mat4(1.0), glm::vec3(0.05f, dist, 0.05f));
         // pretend z is y
-        const glm::vec3 newStart = glm::vec3(startPos.x, startPos.z, startPos.y);
-        const glm::vec3 newEnd = glm::vec3(endPos.x, endPos.z, endPos.y);
+        const glm::vec3 newStart = glm::vec3(startPos.x, startPos.y, startPos.y);
+        const glm::vec3 newEnd = glm::vec3(endPos.x, endPos.y, endPos.y);
         const glm::mat4 trans = glm::translate(glm::mat4(1.0), (newEnd - newStart) * 0.5f + newStart);
 
         // find the rotation of the branch geometry
-        const glm::mat4 rot = glm::mat4(currTurtle.left, currTurtle.forward,
-            currTurtle.up, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+        const glm::mat4 rot = glm::mat4(currTurtle.left, currTurtle.up,
+            currTurtle.forward, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
         // create a transormation matrix
         const glm::mat4 transform = trans * rot * scale;
@@ -211,7 +212,7 @@ TreeStructure::Turtle& TreeStructure::Turtle::operator=(const TreeStructure::Tur
 
 void TreeStructure::Turtle::moveForward(float length)
 {
-    pos = pos + length * glm::vec3(forward);
+    pos = pos + length * glm::vec3(up);
 }
 
 void TreeStructure::Turtle::applyRot(glm::vec3 axis, float angle)
