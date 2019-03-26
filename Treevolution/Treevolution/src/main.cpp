@@ -106,14 +106,18 @@ int main() {
 	  sys.setDefaultStep(0.1f);
 	  sys.setDefaultAngle(30.0f);
 	  sys.loadProgramFromString("F\nF->F[+F][-F]"); //taken from simple1.txt
-    std::string iteratedStr = sys.getIteration(2);
+    std::string iteratedStr = sys.getIteration(1);
 
-    TreeStructure theTree = TreeStructure(1, iteratedStr, -90.0f, 90.0f, 1.0f, 3.0f);
+    TreeStructure theTree = TreeStructure(1, iteratedStr, 0.0f, 90.0f, 1.0f, 3.0f);
+    TreeStructure theTree2 = TreeStructure(2, iteratedStr, 0.0f, 90.0f, 1.0f, 3.0f);
+    theTree.Crossover(&theTree2);
     Mesh treeMesh = theTree.GetTreeMesh(branchMesh);
+    Mesh treeMesh2 = theTree2.GetTreeMesh(branchMesh);
     treeMesh.Create();
+    treeMesh2.Create();
 
     // Load reference model
-    Mesh referenceMesh = Mesh();
+    /*Mesh referenceMesh = Mesh();
     referenceMesh.LoadFromFile("res/models/cubeOrigin5.obj");
 
     // Volumetric fitness evaluation
@@ -130,7 +134,7 @@ int main() {
     }
     gridPoints.Create();
 
-    glPointSize(4);
+    glPointSize(4);*/
 
     while (!glfwWindowShouldClose(window)) {
         // Input handling
@@ -142,8 +146,8 @@ int main() {
 
         // Draw the scene
         flatShader.setCameraViewProj("cameraViewProj", camera.GetViewProj());
-        //flatShader.Draw(treeMesh);
-        flatShader.Draw(gridPoints);
+        flatShader.Draw(treeMesh);
+        //flatShader.Draw(gridPoints);
 
         // Check/call events, swap buffers
         glfwPollEvents();

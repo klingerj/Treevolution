@@ -21,7 +21,7 @@ public:
     TreeNode(TreeNode* t);
     TreeNode(char c, float f, TreeNode* parent);
     TreeNode(char c, float f, glm::vec3 &a, TreeNode* parent);
-    ~TreeNode() {}
+    ~TreeNode();
 
     char GetName() const {
         return name;
@@ -33,9 +33,9 @@ public:
     TreeStructure(int id, std::string gram, float minAngle, float maxAngle, 
         float minLen, float maxLen);
     TreeStructure(TreeStructure* t, TreeNode* root);
-    ~TreeStructure() {}
+    ~TreeStructure();
 
-    // getters
+    // getters and setters
     TreeNode* GetRoot() { return mRoot; }
     size_t GetCount() { return nodeList.size(); }
     TreeNode* GetNodeAtCount(int count) { return nodeList[count]; }
@@ -45,6 +45,7 @@ public:
     float GetMaxAngle() { return mMaxAngle; }
     float GetMinLen() { return mMinLen; }
     float GetMaxLen() { return mMaxLen; }
+    void SetRoot(TreeNode* r) { mRoot = r; }
 
     void CreateNodeList(TreeNode* root);
 

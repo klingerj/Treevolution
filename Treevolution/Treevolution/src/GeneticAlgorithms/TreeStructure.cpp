@@ -28,6 +28,14 @@ TreeNode::TreeNode(char c, float f, glm::vec3 &a, TreeNode* parent) :
 
 }
 
+TreeNode::~TreeNode()
+{
+    for (TreeNode* c : this->children)
+    {
+        delete c;
+    }
+}
+
 TreeStructure::TreeStructure(int id, std::string gram, float minAngle, float maxAngle, 
     float minLen, float maxLen) : mId(id), mGrammar(gram), mMinAngle(minAngle), mMaxAngle(maxAngle),
     mMinLen(minLen), mMaxLen(maxLen), mRoot(nullptr)
@@ -55,6 +63,11 @@ TreeStructure::TreeStructure(TreeStructure* t, TreeNode* root) : mId(t->GetId())
     
     nodeList.clear();
     CreateNodeList(mRoot);
+}
+
+TreeStructure::~TreeStructure()
+{
+    delete mRoot;
 }
 
 void TreeStructure::ConstructTree(TreeNode *root, std::string substring)
@@ -153,6 +166,10 @@ int GetIndexInParentList(TreeNode* node)
 {
     TreeNode* par = node->parent;
     int idx = -1;
+    if (par == nullptr)
+    {
+        return idx;
+    }
     for (int i = 0; i < par->children.size(); i++)
     {
         if (par->children[i] == node) { idx = i; }
@@ -171,35 +188,65 @@ void TreeStructure::Crossover(TreeStructure* parent2)
     int idx2 = GetIndexInParentList(subtree2);
 
     // swap the subtrees
-    subtree1->parent->children[idx1] = subtree2;
-    subtree2->parent->children[idx2] = subtree1;
-    TreeNode* temp = subtree1->parent;
-    subtree1->parent = subtree2->parent;
-    subtree2->parent = temp;
+    if (idx1 == -1 && idx2 == -1)
+    {
+        this->mRoot = subtree2;
+        parent2->SetRoot(subtree1);
+    }
+    else if (idx1 == -1)
+    {
+        this->mRoot = subtree2;
+        subtree2->parent->children[idx2] = subtree1;
+    }
+    else if (idx2 == -1)
+    {
+        subtree1->parent->children[idx1] = subtree2;
+        parent2->SetRoot(subtree1);
+    }
+    else
+    {
+        subtree1->parent->children[idx1] = subtree2;
+        subtree2->parent->children[idx2] = subtree1;
+        TreeNode* temp = subtree1->parent;
+        subtree1->parent = subtree2->parent;
+        subtree2->parent = temp;
+    }
 }
 
 void TreeStructure::Grow()
 {
     // TODO
+
+    // repopulate the node list after the change
+    nodeList.clear();
+    CreateNodeList(mRoot);
 }
 
 void TreeStructure::Cut()
 {
     // get a random node
-    int rand = std::rand() % this->nodeList.size();
+    std::uniform_real_distribution<float> chooseDist(0.0, this->nodeList.size());
+    int rand = floor(chooseDist(mGenerator));
     TreeNode* gene = this->GetNodeAtCount(rand);
 
     if (gene != mRoot)
     {
         int idx = GetIndexInParentList(gene);
         gene->parent->children.erase(gene->parent->children.begin() + idx);
+
+        delete gene;
     }
+
+    // repopulate the node list after the change
+    nodeList.clear();
+    CreateNodeList(mRoot);
 }
 
 void TreeStructure::Alter()
 {
     // get a random node
-    int rand = std::rand() % this->nodeList.size();
+    std::uniform_real_distribution<float> chooseDist(0.0, this->nodeList.size());
+    int rand = floor(chooseDist(mGenerator));
     TreeNode* gene = this->GetNodeAtCount(rand);
 
     // recompute random parameters
@@ -263,7 +310,7 @@ void TreeStructure::processNode(TreeNode* currNode, Mesh &baseMesh)
 
         // find the scale and translation of the branch geometry
         const float dist = glm::length(startPos - endPos);
-        const float radius = 0.3f;
+        const float radius = 0.1f;
         const glm::mat4 scale = glm::scale(glm::mat4(1.0), glm::vec3(radius, dist, radius));
         
         const glm::vec3 newStart = glm::vec3(startPos.x, startPos.y, startPos.z);
