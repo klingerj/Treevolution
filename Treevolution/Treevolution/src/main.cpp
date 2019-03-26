@@ -4,6 +4,7 @@
 
 #include "OpenGL/ShaderProgram.h"
 #include "Scene/DrawableLine.h"
+#include "Scene/DrawablePoints.h"
 #include "LSystem.h"
 #include "GeneticAlgorithms/Fitness/FitnessEvalMethod.h"
 #include "GeneticAlgorithms/TreeStructure.h"
@@ -111,29 +112,25 @@ int main() {
     Mesh treeMesh = theTree.GetTreeMesh(branchMesh);
     treeMesh.Create();
 
-	  // Run turtle
-	  //std::vector<LSystem::Branch> branches;
-	  //sys.process(2, branches);
-
     // Load reference model
     Mesh referenceMesh = Mesh();
-    referenceMesh.LoadFromFile("res/models/cube.obj");
+    referenceMesh.LoadFromFile("res/models/cubeOrigin5.obj");
 
     // Volumetric fitness evaluation
     FitnessEvalMethod* eval = new VolumetricFitnessEval(0.1f);
-    dynamic_cast<VolumetricFitnessEval*>(eval)->SetGrids(referenceMesh);
+    VolumetricFitnessEval* volumetricEval = dynamic_cast<VolumetricFitnessEval*>(eval);
+    volumetricEval->SetGrid(referenceMesh, 0);
+    volumetricEval->SetGrid(treeMesh, 1);
     // TODO: better way to do this other than dynamic casting?
 
+    DrawablePoints gridPoints;
+    std::vector<glm::vec3> points = volumetricEval->GetGridPoints(1);
+    for (auto p : points) {
+        gridPoints.addPoint(p);
+    }
+    gridPoints.Create();
 
-	  // Create lines from branches
-	  /*for (LSystem::Branch b : branches)
-	  {
-	  	Line l;
-	  	l.start = b.first;
-	  	l.end = b.second;
-	  	lines.addLineSegment(l);
-	  }
-    lines.Create();*/
+    glPointSize(4);
 
     while (!glfwWindowShouldClose(window)) {
         // Input handling
@@ -145,7 +142,8 @@ int main() {
 
         // Draw the scene
         flatShader.setCameraViewProj("cameraViewProj", camera.GetViewProj());
-        flatShader.Draw(treeMesh);
+        //flatShader.Draw(treeMesh);
+        flatShader.Draw(gridPoints);
 
         // Check/call events, swap buffers
         glfwPollEvents();
