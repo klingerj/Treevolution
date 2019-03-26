@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 #include <stack>
+#include <random>
+#include <functional>
 #include <glm/glm.hpp>
 
 #include "../Scene/Mesh.h"
@@ -12,12 +14,13 @@ public:
     char name;
     float param;
     glm::vec3 axis;
+    TreeNode* parent;
     std::vector<TreeNode*> children;
 
     TreeNode();
     TreeNode(TreeNode* t);
-    TreeNode(char c, float f);
-    TreeNode(char c, float f, glm::vec3 &a);
+    TreeNode(char c, float f, TreeNode* parent);
+    TreeNode(char c, float f, glm::vec3 &a, TreeNode* parent);
     ~TreeNode() {}
 
     char GetName() const {
@@ -27,14 +30,16 @@ public:
 
 class TreeStructure {
 public:
-    TreeStructure(std::string gram, float minAngle, float maxAngle, float minLen, float maxLen);
+    TreeStructure(int id, std::string gram, float minAngle, float maxAngle, 
+        float minLen, float maxLen);
     TreeStructure(TreeStructure* t, TreeNode* root);
     ~TreeStructure() {}
 
     // getters
     TreeNode* GetRoot() { return mRoot; }
-    int GetCount() { return nodeList.size(); }
+    size_t GetCount() { return nodeList.size(); }
     TreeNode* GetNodeAtCount(int count) { return nodeList[count]; }
+    int GetId() { return mId; }
     std::string GetGram() { return mGrammar; }
     float GetMinAngle() { return mMinAngle; }
     float GetMaxAngle() { return mMaxAngle; }
@@ -51,10 +56,11 @@ public:
     TreeNode* AddChildToNode(TreeNode* parent, char c);
 
     // Genetic algoirthm functions
-    std::vector<TreeStructure> Crossover(TreeStructure* parent2);
-    void Grow(TreeNode* toGrow);
-    void Cut(TreeNode* toCut);
+    void Crossover(TreeStructure* parent2);
+    void Grow();
+    void Cut();
     void Alter();
+    void Mutate();
 
     // TODO: Free all heap-allocated tree nodes
 
@@ -62,11 +68,18 @@ private:
     void ConstructTree(TreeNode *root, std::string substring);
 
 protected:
+    int mId;
     std::string mGrammar;
     float mMinAngle;
     float mMaxAngle;
     float mMinLen;
     float mMaxLen;
+
+    // RNG
+    std::default_random_engine mGenerator;
+    std::uniform_real_distribution<float> mAxisDist;
+    std::uniform_real_distribution<float> mAngleDist;
+    std::uniform_real_distribution<float> mLenDist;
 
     // Tree data
     TreeNode* mRoot;

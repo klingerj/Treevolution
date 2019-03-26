@@ -107,7 +107,7 @@ int main() {
 	  sys.loadProgramFromString("F\nF->F[+F][-F]"); //taken from simple1.txt
     std::string iteratedStr = sys.getIteration(2);
 
-    TreeStructure theTree = TreeStructure(iteratedStr, -90.0f, 90.0f, 1.0f, 3.0f);
+    TreeStructure theTree = TreeStructure(1, iteratedStr, -90.0f, 90.0f, 1.0f, 3.0f);
     Mesh treeMesh = theTree.GetTreeMesh(branchMesh);
     treeMesh.Create();
 

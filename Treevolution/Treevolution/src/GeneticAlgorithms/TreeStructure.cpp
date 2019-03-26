@@ -5,44 +5,54 @@
 
 #define Deg2Rad 0.017453292519943295769236907684886
 
-TreeNode::TreeNode() : TreeNode(0, -1.0f)
+TreeNode::TreeNode() : TreeNode(0, -1.0f, nullptr)
 {
 
 }
 
 TreeNode::TreeNode(TreeNode* t) : name(t->name), param(t->param),
-    axis(t->axis), children(t->children)
+    axis(t->axis), parent(t->parent), children(t->children)
 {
 
 }
 
-TreeNode::TreeNode(char c, float f) : name(c), param(f)
+TreeNode::TreeNode(char c, float f, TreeNode* parent) : name(c), param(f),
+    parent(parent)
 {
     axis = glm::vec3(0.f);
 }
 
-TreeNode::TreeNode(char c, float f, glm::vec3 &a) : name(c), param(f), axis(a)
+TreeNode::TreeNode(char c, float f, glm::vec3 &a, TreeNode* parent) : 
+    name(c), param(f), axis(a), parent(parent)
 {
 
 }
 
-TreeStructure::TreeStructure(std::string gram, float minAngle, float maxAngle, 
-    float minLen, float maxLen) : mGrammar(gram), mMinAngle(minAngle), mMaxAngle(maxAngle),
+TreeStructure::TreeStructure(int id, std::string gram, float minAngle, float maxAngle, 
+    float minLen, float maxLen) : mId(id), mGrammar(gram), mMinAngle(minAngle), mMaxAngle(maxAngle),
     mMinLen(minLen), mMaxLen(maxLen), mRoot(nullptr)
 {
+    mGenerator.seed(mId);
+    mAxisDist = std::uniform_real_distribution<float>(-1.0, 1.0);
+    mAngleDist = std::uniform_real_distribution<float>(mMinAngle, mMaxAngle);
+    mLenDist = std::uniform_real_distribution<float>(mMinLen, mMaxLen);
+    
     mRoot = new TreeNode();
     nodeList.push_back(mRoot);
 
     ConstructTree(mRoot, gram);
 
     currTurtle  = Turtle();
-
-    std::srand(2019);
 }
 
-TreeStructure::TreeStructure(TreeStructure* t, TreeNode* root) : mGrammar(t->GetGram()), mMinAngle(t->GetMinAngle()), 
-    mMaxAngle(t->GetMaxAngle()), mMinLen(t->GetMinLen()), mMaxLen(t->GetMaxLen()), mRoot(root)
+TreeStructure::TreeStructure(TreeStructure* t, TreeNode* root) : mId(t->GetId()), mGrammar(t->GetGram()), 
+    mMinAngle(t->GetMinAngle()), mMaxAngle(t->GetMaxAngle()), mMinLen(t->GetMinLen()), mMaxLen(t->GetMaxLen()), mRoot(root)
 {
+    mGenerator.seed(mId);
+    mAxisDist = std::uniform_real_distribution<float>(-1.0, 1.0);
+    mAngleDist = std::uniform_real_distribution<float>(mMinAngle, mMaxAngle);
+    mLenDist = std::uniform_real_distribution<float>(mMinLen, mMaxLen);
+    
     nodeList.clear();
     CreateNodeList(mRoot);
 }
@@ -82,14 +92,18 @@ TreeNode* TreeStructure::AddChildToNode(TreeNode* parent, char c)
         // generate random float between mMinLen and mMaxLen 
         p = (float(std::rand()) / RAND_MAX) * (mMaxLen - mMinLen) + mMinLen;
         //p = 1.0f;
-        (*newNode) = TreeNode(c, p);
+        p = mLenDist(mGenerator);
+        (*newNode) = TreeNode(c, p, parent);
     }
     else if (c == '-')
     {
         // generate three random numbers for axis and a random number for angle val
-        float x = (float(std::rand()) / RAND_MAX) * 2 - 1;
+        float x = (float(rand()) / RAND_MAX) * 2 - 1;
         float y = (float(std::rand()) / RAND_MAX) * 2 - 1;
         float z = (float(std::rand()) / RAND_MAX) * 2 - 1;
+        x = mAxisDist(mGenerator);
+        y = mAxisDist(mGenerator);
+        z = mAxisDist(mGenerator);
         glm::vec3 a(x, y, z);
         a = glm::normalize(a);
 
@@ -97,7 +111,8 @@ TreeNode* TreeStructure::AddChildToNode(TreeNode* parent, char c)
 
         p = -1.f * ((float(std::rand()) / RAND_MAX) * (mMaxAngle - mMinAngle) + mMinAngle);
         //p = -45.0f;
-        (*newNode) = TreeNode(c, p, a);
+        p = -1.f * mAngleDist(mGenerator);
+        (*newNode) = TreeNode(c, p, a, parent);
     }
     else if (c == '+')
     {
@@ -105,6 +120,9 @@ TreeNode* TreeStructure::AddChildToNode(TreeNode* parent, char c)
         float x = (float(std::rand()) / RAND_MAX) * 2 - 1;
         float y = (float(std::rand()) / RAND_MAX) * 2 - 1;
         float z = (float(std::rand()) / RAND_MAX) * 2 - 1;
+        x = mAxisDist(mGenerator);
+        y = mAxisDist(mGenerator);
+        z = mAxisDist(mGenerator);
         glm::vec3 a(x, y, z);
         a = glm::normalize(a);
 
@@ -112,7 +130,8 @@ TreeNode* TreeStructure::AddChildToNode(TreeNode* parent, char c)
 
         p = (float(std::rand()) / RAND_MAX) * (mMaxAngle - mMinAngle) + mMinAngle;
         //p = 45.0f;
-        (*newNode) = TreeNode(c, p, a);
+        p = mAngleDist(mGenerator);
+        (*newNode) = TreeNode(c, p, a, parent);
     }
 
     parent->children.push_back(newNode);
@@ -130,60 +149,51 @@ void TreeStructure::CreateNodeList(TreeNode* root)
     }
 }
 
-void ReplaceSubtree(TreeNode* root, TreeNode* swapNode, TreeNode* toSwap)
+int GetIndexInParentList(TreeNode* node)
 {
-    if (root == nullptr)
+    TreeNode* par = node->parent;
+    int idx = -1;
+    for (int i = 0; i < par->children.size(); i++)
     {
-        // FAIL
-        std::cout << "Subtree is not in original tree :(";
-        return;
+        if (par->children[i] == node) { idx = i; }
     }
-    for (int i = 0; i < root->children.size(); i++)
-    {
-        if (root->children[i] == swapNode)
-        {
-            root->children[i] = toSwap;
-            return;
-        }
-    }
-    // The swapNode is not a child of this root, so we iterate on the children
-    for (TreeNode* c : root->children)
-    {
-        ReplaceSubtree(c, swapNode, toSwap);
-    }
+    return idx;
 }
 
-std::vector<TreeStructure> TreeStructure::Crossover(TreeStructure* parent2)
+void TreeStructure::Crossover(TreeStructure* parent2)
 {
     // get a random node from both this and parent2
     int rand1 = std::rand() % this->nodeList.size();
     int rand2 = std::rand() % parent2->GetCount();
     TreeNode* subtree1 = this->GetNodeAtCount(rand1);
     TreeNode* subtree2 = parent2->GetNodeAtCount(rand2);
+    int idx1 = GetIndexInParentList(subtree1);
+    int idx2 = GetIndexInParentList(subtree2);
 
-    // create child root nodes which are copies of parents
-    TreeNode* child1 = new TreeNode(this->mRoot);
-    TreeNode* child2 = new TreeNode(parent2->GetRoot());
     // swap the subtrees
-    ReplaceSubtree(child1, subtree1, subtree2);
-    ReplaceSubtree(child2, subtree2, subtree1);
-
-    // make the children into TreeStructures and return
-    std::vector<TreeStructure> children;
-    children.push_back(TreeStructure(this, child1));
-    children.push_back(TreeStructure(parent2, child2));
-
-    return children;
+    subtree1->parent->children[idx1] = subtree2;
+    subtree2->parent->children[idx2] = subtree1;
+    TreeNode* temp = subtree1->parent;
+    subtree1->parent = subtree2->parent;
+    subtree2->parent = temp;
 }
 
-void TreeStructure::Grow(TreeNode* toGrow)
+void TreeStructure::Grow()
 {
-
+    // TODO
 }
 
-void TreeStructure::Cut(TreeNode* toCut)
+void TreeStructure::Cut()
 {
+    // get a random node
+    int rand = std::rand() % this->nodeList.size();
+    TreeNode* gene = this->GetNodeAtCount(rand);
 
+    if (gene != mRoot)
+    {
+        int idx = GetIndexInParentList(gene);
+        gene->parent->children.erase(gene->parent->children.begin() + idx);
+    }
 }
 
 void TreeStructure::Alter()
@@ -196,29 +206,48 @@ void TreeStructure::Alter()
     if (gene->name == 'F')
     {
         // generate random float between mMinLen and mMaxLen 
-        gene->param = (float(std::rand()) / RAND_MAX) * (mMaxLen - mMinLen) + mMinLen;
+        gene->param = mLenDist(mGenerator); //(float(std::rand()) / RAND_MAX) * (mMaxLen - mMinLen) + mMinLen;
     }
     else if (gene->name == '+')
     {
         // generate three random numbers for axis and a random number for angle val
-        float x = (float(std::rand()) / RAND_MAX) * 2 - 1;
-        float y = (float(std::rand()) / RAND_MAX) * 2 - 1;
-        float z = (float(std::rand()) / RAND_MAX) * 2 - 1;
+        float x = mAxisDist(mGenerator); //(float(std::rand()) / RAND_MAX) * 2 - 1;
+        float y = mAxisDist(mGenerator); //(float(std::rand()) / RAND_MAX) * 2 - 1;
+        float z = mAxisDist(mGenerator); //(float(std::rand()) / RAND_MAX) * 2 - 1;
         glm::vec3 a(x, y, z);
         gene->axis = glm::normalize(a);
 
-        gene->param = (float(std::rand()) / RAND_MAX) * (mMaxAngle - mMinAngle) + mMinAngle;
+        gene->param = mAngleDist(mGenerator); //(float(std::rand()) / RAND_MAX) * (mMaxAngle - mMinAngle) + mMinAngle;
     }
     else if (gene->name == '-')
     {
         // generate three random numbers for axis and a random number for angle val
-        float x = (float(std::rand()) / RAND_MAX) * 2 - 1;
-        float y = (float(std::rand()) / RAND_MAX) * 2 - 1;
-        float z = (float(std::rand()) / RAND_MAX) * 2 - 1;
+        float x = mAxisDist(mGenerator); //(float(std::rand()) / RAND_MAX) * 2 - 1;
+        float y = mAxisDist(mGenerator); //(float(std::rand()) / RAND_MAX) * 2 - 1;
+        float z = mAxisDist(mGenerator); //(float(std::rand()) / RAND_MAX) * 2 - 1;
         glm::vec3 a(x, y, z);
         gene->axis = glm::normalize(a);
 
-        gene->param = -1.f * ((float(std::rand()) / RAND_MAX) * (mMaxAngle - mMinAngle) + mMinAngle);
+        gene->param = mAngleDist(mGenerator); //-1.f * ((float(std::rand()) / RAND_MAX) * (mMaxAngle - mMinAngle) + mMinAngle);
+    }
+}
+
+void TreeStructure::Mutate()
+{
+    std::uniform_real_distribution<int> chooseDist(0, 3);
+    int action = chooseDist(mGenerator);
+
+    if (action == 0)
+    {
+        Grow();
+    }
+    else if (action == 1)
+    {
+        Cut();
+    }
+    else if (action == 2)
+    {
+        Alter();
     }
 }
 
