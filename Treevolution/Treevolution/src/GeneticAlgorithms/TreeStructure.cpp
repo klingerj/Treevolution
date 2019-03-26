@@ -234,18 +234,18 @@ void TreeStructure::Alter()
 
 void TreeStructure::Mutate()
 {
-    std::uniform_real_distribution<int> chooseDist(0, 3);
-    int action = chooseDist(mGenerator);
+    std::uniform_real_distribution<float> chooseDist(0.0, 3.0);
+    float action = chooseDist(mGenerator);
 
-    if (action == 0)
+    if (action <= 1)
     {
         Grow();
     }
-    else if (action == 1)
+    else if (action <= 2)
     {
         Cut();
     }
-    else if (action == 2)
+    else if (action <= 3)
     {
         Alter();
     }
