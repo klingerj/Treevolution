@@ -1,18 +1,17 @@
-#include "DrawableLine.h"
+#include "DrawablePoints.h"
 
-DrawableLine::DrawableLine() : Drawable(), lineSegments() {}
+DrawablePoints::DrawablePoints() : Drawable(), points() {}
 
-DrawableLine::~DrawableLine() {}
+DrawablePoints::~DrawablePoints() {}
 
-void DrawableLine::Create() {
+void DrawablePoints::Create() {
     // Indices
     genBufIdx();
 
     // Create an indices vector
     std::vector<unsigned int> indices = std::vector<unsigned int>();
-    for (int i = 0; i < lineSegments.size(); ++i) {
+    for (int i = 0; i < points.size(); ++i) {
         indices.emplace_back(i);
-        indices.emplace_back(i + 1);
     }
 
     count = (int)indices.size();
@@ -21,10 +20,9 @@ void DrawableLine::Create() {
 
     // Positions
     std::vector<glm::vec3> lineData = std::vector<glm::vec3>();
-    lineData.reserve(lineSegments.size() * 2);
-    for (int i = 0; i < lineSegments.size(); ++i) {
-        lineData.emplace_back(lineSegments[i].start);
-        lineData.emplace_back(lineSegments[i].end);
+    lineData.reserve(points.size());
+    for (int i = 0; i < points.size(); ++i) {
+        lineData.emplace_back(points[i]);
     }
 
     genBufPos();
@@ -32,6 +30,6 @@ void DrawableLine::Create() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * lineData.size(), lineData.data(), GL_STATIC_DRAW);
 }
 
-GLenum DrawableLine::DrawMode() {
-    return GL_LINES;
+GLenum DrawablePoints::DrawMode() {
+    return GL_POINTS;
 }

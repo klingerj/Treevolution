@@ -3,6 +3,7 @@
 #include "glm/glm.hpp"
 
 #include <vector>
+#include <algorithm>
 
 #include "../OpenGL/Drawable.h"
 #include "Raytracing/Raytracing.h"
@@ -74,15 +75,26 @@ public:
     const std::vector<glm::vec3>&    GetPositions() const { return positions; }
     const std::vector<glm::vec3>&    GetNormals()   const { return normals; }
     const std::vector<unsigned int>& GetIndices()   const { return indices; }
+    const glm::vec3& GetMinPos() const { return minPoint; }
+    const glm::vec3& GetMaxPos() const { return maxPoint; }
 
     // Setters
     void SetTriangles(std::vector<Triangle>& t);
     void SetPositions(std::vector<glm::vec3>& p) { positions = p; }
     void SetNormals(std::vector<glm::vec3>& n) { normals = n; }
     void SetIndices(std::vector<unsigned int>& i) { indices = i; }
-
-    const glm::vec3& GetMinPos() const { return minPoint; }
-    const glm::vec3& GetMaxPos() const { return maxPoint; }
+    void SetMinMaxPosFromTris() {
+        for (int i = 0; i < triangles.size(); ++i) {
+            for (int j = 0; j < 3; ++j) {
+                minPoint.x = std::min(minPoint.x, triangles[i].GetPoints()[j].x);
+                minPoint.y = std::min(minPoint.y, triangles[i].GetPoints()[j].y);
+                minPoint.z = std::min(minPoint.z, triangles[i].GetPoints()[j].z);
+                maxPoint.x = std::max(maxPoint.x, triangles[i].GetPoints()[j].x);
+                maxPoint.y = std::max(maxPoint.y, triangles[i].GetPoints()[j].y);
+                maxPoint.z = std::max(maxPoint.z, triangles[i].GetPoints()[j].z);
+            }
+        }
+    }
 
     // Raytracing functions
     Intersection Intersect(const Ray& r) const; // Intersect a single ray with this mesh

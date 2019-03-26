@@ -25,6 +25,8 @@ private:
     uint8_t* gridCurrent;
 
     float gridCellSize;
+    glm::vec3 gridDim;
+    glm::vec3 gridMin;
 
 public:
     VolumetricFitnessEval(float gridCellSize);
@@ -34,8 +36,6 @@ public:
     int Evaluate() const override;
 
     // Set the reference volumetric grid
-    void SetGrids(const Mesh& mesh);
-
-    // Set the current volumetric grid
-    //void SetCurrentGrid(const std::vector<Triangle>& mesh);
+    void SetGrid(const Mesh& mesh, uint8_t gridType);
+    std::vector<glm::vec3> GetGridPoints(uint8_t gridType);
 };
