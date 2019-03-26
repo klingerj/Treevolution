@@ -1,10 +1,17 @@
 #include "TreeStructure.h"
 
+#include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
 
 #define Deg2Rad 0.017453292519943295769236907684886
 
 TreeNode::TreeNode() : TreeNode(0, -1.0f)
+{
+
+}
+
+TreeNode::TreeNode(TreeNode* t) : name(t->name), param(t->param),
+    axis(t->axis), children(t->children)
 {
 
 }
@@ -24,12 +31,20 @@ TreeStructure::TreeStructure(std::string gram, float minAngle, float maxAngle,
     mMinLen(minLen), mMaxLen(maxLen), mRoot(nullptr)
 {
     mRoot = new TreeNode();
+    nodeList.push_back(mRoot);
 
     ConstructTree(mRoot, gram);
 
     currTurtle  = Turtle();
 
     std::srand(2019);
+}
+
+TreeStructure::TreeStructure(TreeStructure* t, TreeNode* root) : mGrammar(t->GetGram()), mMinAngle(t->GetMinAngle()), 
+    mMaxAngle(t->GetMaxAngle()), mMinLen(t->GetMinLen()), mMaxLen(t->GetMaxLen()), mRoot(root)
+{
+    nodeList.clear();
+    CreateNodeList(mRoot);
 }
 
 void TreeStructure::ConstructTree(TreeNode *root, std::string substring)
@@ -66,7 +81,7 @@ TreeNode* TreeStructure::AddChildToNode(TreeNode* parent, char c)
     {
         // generate random float between mMinLen and mMaxLen 
         p = (float(std::rand()) / RAND_MAX) * (mMaxLen - mMinLen) + mMinLen;
-        p = 1.0f;
+        //p = 1.0f;
         (*newNode) = TreeNode(c, p);
     }
     else if (c == '-')
@@ -78,10 +93,10 @@ TreeNode* TreeStructure::AddChildToNode(TreeNode* parent, char c)
         glm::vec3 a(x, y, z);
         a = glm::normalize(a);
 
-        a = glm::vec3(0, 0, 1);
+        //a = glm::vec3(0, 0, 1);
 
-        p = (float(std::rand()) / RAND_MAX) * (mMaxAngle - mMinAngle) + mMinAngle;
-        p = -45.0f;
+        p = -1.f * ((float(std::rand()) / RAND_MAX) * (mMaxAngle - mMinAngle) + mMinAngle);
+        //p = -45.0f;
         (*newNode) = TreeNode(c, p, a);
     }
     else if (c == '+')
@@ -93,16 +108,118 @@ TreeNode* TreeStructure::AddChildToNode(TreeNode* parent, char c)
         glm::vec3 a(x, y, z);
         a = glm::normalize(a);
 
-        a = glm::vec3(0, 0, 1);
+        //a = glm::vec3(0, 0, 1);
 
         p = (float(std::rand()) / RAND_MAX) * (mMaxAngle - mMinAngle) + mMinAngle;
-        p = 45.0f;
+        //p = 45.0f;
         (*newNode) = TreeNode(c, p, a);
     }
 
     parent->children.push_back(newNode);
+    nodeList.push_back(newNode);
 
     return newNode;
+}
+
+void TreeStructure::CreateNodeList(TreeNode* root)
+{
+    nodeList.push_back(root);
+    for (TreeNode* c : root->children)
+    {
+        CreateNodeList(c);
+    }
+}
+
+void ReplaceSubtree(TreeNode* root, TreeNode* swapNode, TreeNode* toSwap)
+{
+    if (root == nullptr)
+    {
+        // FAIL
+        std::cout << "Subtree is not in original tree :(";
+        return;
+    }
+    for (int i = 0; i < root->children.size(); i++)
+    {
+        if (root->children[i] == swapNode)
+        {
+            root->children[i] = toSwap;
+            return;
+        }
+    }
+    // The swapNode is not a child of this root, so we iterate on the children
+    for (TreeNode* c : root->children)
+    {
+        ReplaceSubtree(c, swapNode, toSwap);
+    }
+}
+
+std::vector<TreeStructure> TreeStructure::Crossover(TreeStructure* parent2)
+{
+    // get a random node from both this and parent2
+    int rand1 = std::rand() % this->nodeList.size();
+    int rand2 = std::rand() % parent2->GetCount();
+    TreeNode* subtree1 = this->GetNodeAtCount(rand1);
+    TreeNode* subtree2 = parent2->GetNodeAtCount(rand2);
+
+    // create child root nodes which are copies of parents
+    TreeNode* child1 = new TreeNode(this->mRoot);
+    TreeNode* child2 = new TreeNode(parent2->GetRoot());
+    // swap the subtrees
+    ReplaceSubtree(child1, subtree1, subtree2);
+    ReplaceSubtree(child2, subtree2, subtree1);
+
+    // make the children into TreeStructures and return
+    std::vector<TreeStructure> children;
+    children.push_back(TreeStructure(this, child1));
+    children.push_back(TreeStructure(parent2, child2));
+
+    return children;
+}
+
+void TreeStructure::Grow(TreeNode* toGrow)
+{
+
+}
+
+void TreeStructure::Cut(TreeNode* toCut)
+{
+
+}
+
+void TreeStructure::Alter()
+{
+    // get a random node
+    int rand = std::rand() % this->nodeList.size();
+    TreeNode* gene = this->GetNodeAtCount(rand);
+
+    // recompute random parameters
+    if (gene->name == 'F')
+    {
+        // generate random float between mMinLen and mMaxLen 
+        gene->param = (float(std::rand()) / RAND_MAX) * (mMaxLen - mMinLen) + mMinLen;
+    }
+    else if (gene->name == '+')
+    {
+        // generate three random numbers for axis and a random number for angle val
+        float x = (float(std::rand()) / RAND_MAX) * 2 - 1;
+        float y = (float(std::rand()) / RAND_MAX) * 2 - 1;
+        float z = (float(std::rand()) / RAND_MAX) * 2 - 1;
+        glm::vec3 a(x, y, z);
+        gene->axis = glm::normalize(a);
+
+        gene->param = (float(std::rand()) / RAND_MAX) * (mMaxAngle - mMinAngle) + mMinAngle;
+    }
+    else if (gene->name == '-')
+    {
+        // generate three random numbers for axis and a random number for angle val
+        float x = (float(std::rand()) / RAND_MAX) * 2 - 1;
+        float y = (float(std::rand()) / RAND_MAX) * 2 - 1;
+        float z = (float(std::rand()) / RAND_MAX) * 2 - 1;
+        glm::vec3 a(x, y, z);
+        gene->axis = glm::normalize(a);
+
+        gene->param = -1.f * ((float(std::rand()) / RAND_MAX) * (mMaxAngle - mMinAngle) + mMinAngle);
+    }
 }
 
 void TreeStructure::processNode(TreeNode* currNode, Mesh &baseMesh)
@@ -116,13 +233,12 @@ void TreeStructure::processNode(TreeNode* currNode, Mesh &baseMesh)
         glm::vec3 endPos = currTurtle.pos;
 
         // find the scale and translation of the branch geometry
-        //const float dist = glm::length(endPos - startPos);
         const float dist = glm::length(startPos - endPos);
         const float radius = 0.3f;
         const glm::mat4 scale = glm::scale(glm::mat4(1.0), glm::vec3(radius, dist, radius));
-        // pretend z is y
-        const glm::vec3 newStart = glm::vec3(startPos.x, startPos.y, startPos.y);
-        const glm::vec3 newEnd = glm::vec3(endPos.x, endPos.y, endPos.y);
+        
+        const glm::vec3 newStart = glm::vec3(startPos.x, startPos.y, startPos.z);
+        const glm::vec3 newEnd = glm::vec3(endPos.x, endPos.y, endPos.z);
         const glm::mat4 trans = glm::translate(glm::mat4(1.0), (newEnd - newStart) * 0.5f + newStart);
 
         // find the rotation of the branch geometry
@@ -220,7 +336,7 @@ void TreeStructure::Turtle::moveForward(float length)
 
 void TreeStructure::Turtle::applyRot(glm::vec3 axis, float angle)
 {
-    glm::mat4 mat = glm::rotate(glm::mat4(1.0), float(Deg2Rad*angle), axis); // Y axis
+    glm::mat4 mat = glm::rotate(glm::mat4(1.0), float(Deg2Rad*angle), axis);
     glm::mat4 world2local = glm::mat4(left, up, forward, glm::vec4(0.0));
     up = world2local * mat * glm::vec4(0, 1, 0, 0);
     left = world2local * mat * glm::vec4(1, 0, 0, 0);
