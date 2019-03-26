@@ -28,6 +28,7 @@
     <ClCompile Include="src\OpenGL\ShaderProgram.cpp" />
     <ClCompile Include="src\Scene\Camera.cpp" />
     <ClCompile Include="src\Scene\DrawableLine.cpp" />
+    <ClCompile Include="src\Scene\DrawablePoints.cpp" />
     <ClCompile Include="src\Scene\Mesh.cpp" />
     <ClCompile Include="src\Scene\Raytracing\Raytracing.cpp" />
   </ItemGroup>
@@ -40,6 +41,7 @@
     <ClInclude Include="src\OpenGL\ShaderProgram.h" />
     <ClInclude Include="src\Scene\Camera.h" />
     <ClInclude Include="src\Scene\DrawableLine.h" />
+    <ClInclude Include="src\Scene\DrawablePoints.h" />
     <ClInclude Include="src\Scene\Mesh.h" />
     <ClInclude Include="src\Scene\Raytracing\Raytracing.h" />
   </ItemGroup>

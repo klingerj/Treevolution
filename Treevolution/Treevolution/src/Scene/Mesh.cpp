@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <algorithm>
+#include <limits>
 
 void Mesh::LoadFromFile(const char* filepath) {
     filename = std::string(filepath, 0, 100); // max 100 characters for internal file name
@@ -95,6 +96,13 @@ void Mesh::SetTriangles(std::vector<Triangle>& t)
     }
 }
 
+//https://stackoverflow.com/questions/17333/what-is-the-most-effective-way-for-float-and-double-comparison
+bool combinedToleranceCompare(float x, float y)
+{
+    const float maxXYOne = std::max({ 1.0f, std::fabsf(x) , std::fabsf(y) });
+    return std::fabsf(x - y) <= std::numeric_limits<float>::epsilon() * maxXYOne * 2.0f;
+}
+
 Intersection Triangle::Intersect(const Ray& r) const {
     // 1. Ray-plane intersection
     const float t = glm::dot(planeNormal, (points[0] - r.GetOrigin())) / glm::dot(planeNormal, r.GetDirection());
@@ -105,13 +113,13 @@ Intersection Triangle::Intersect(const Ray& r) const {
     const glm::vec3 P = r.GetOrigin() + t * r.GetDirection();
 
     // 2. Barycentric test
-    const double S = 1.0 / (0.5 * glm::length(glm::cross(points[0] - points[1], points[0] - points[2])));
-    const double S1 = 0.5 * glm::length(glm::cross(P - points[1], P - points[2]));
-    const double S2 = 0.5 * glm::length(glm::cross(P - points[2], P - points[0]));
-    const double S3 = 0.5 * glm::length(glm::cross(P - points[0], P - points[1]));
-    const double sum = (S1 + S2 + S3) * S;
+    const float S = 1.0f / (0.5f * glm::length(glm::cross(points[0] - points[1], points[0] - points[2])));
+    const float S1 = 0.5f * glm::length(glm::cross(P - points[1], P - points[2]));
+    const float S2 = 0.5f * glm::length(glm::cross(P - points[2], P - points[0]));
+    const float S3 = 0.5f * glm::length(glm::cross(P - points[0], P - points[1]));
+    const float sum = (S1 + S2 + S3) * S;
 
-    if ((S1 > 0.0 && S1 < 1.0) && (S2 > 0.0 && S2 < 1.0) && (S3 > 0.0 && S3 < 1.0) && std::abs(sum - 1.0) < 0.000001) {
+    if ((S1 >= 0.0f && S1 <= 1.0f) && (S2 >= 0.0f && S2 <= 1.0f) && (S3 >= 0.0f && S3 <= 1.0f) && combinedToleranceCompare(sum, 1.0f)) {
         return Intersection(P, planeNormal, t);
     }
     return Intersection();
@@ -129,7 +137,9 @@ Intersection Mesh::Intersect(const Ray& r) const {
 }
 
 bool Mesh::Contains(const glm::vec3 & p) const {
-    Ray r = Ray(p, glm::vec3(0.0f, 0.0f, 1.0f)); // Ray direction is arbitrary. It can be anything
+    Ray r = Ray(p, glm::normalize(glm::vec3(((float)std::rand()) / RAND_MAX,
+                                            ((float)std::rand()) / RAND_MAX,
+                                            ((float)std::rand()) / RAND_MAX))); // Ray direction is arbitrary. It can be anything
     Intersection isect = Intersect(r);
     unsigned int isectCounter = 0;
     while (isect.IsValid()) {
@@ -138,7 +148,23 @@ bool Mesh::Contains(const glm::vec3 & p) const {
         r = isect.SpawnRayAtPoint(r);
         isect = Intersect(r);
     }
-    return isectCounter == 1; // There was an odd number of intersections
+    bool isInsideFirst = isectCounter == 1; // There was an odd number of intersections
+
+    if (!isInsideFirst)
+    {
+        return false;
+    }
+
+    r = Ray(p, glm::normalize(p - minPoint));
+    isect = Intersect(r);
+    isectCounter = 0;
+    while (isect.IsValid()) {
+        ++isectCounter;
+        isectCounter %= 2;
+        r = isect.SpawnRayAtPoint(r);
+        isect = Intersect(r);
+    }
+    return isInsideFirst && (isectCounter == 1);
 }
 
 void Mesh::Create() {

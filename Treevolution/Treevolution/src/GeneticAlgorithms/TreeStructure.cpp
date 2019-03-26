@@ -233,9 +233,9 @@ void TreeStructure::processNode(TreeNode* currNode, Mesh &baseMesh)
         glm::vec3 endPos = currTurtle.pos;
 
         // find the scale and translation of the branch geometry
-        //const float dist = glm::length(endPos - startPos);
         const float dist = glm::length(startPos - endPos);
-        const glm::mat4 scale = glm::scale(glm::mat4(1.0), glm::vec3(0.05f, dist, 0.05f));
+        const float radius = 0.3f;
+        const glm::mat4 scale = glm::scale(glm::mat4(1.0), glm::vec3(radius, dist, radius));
         
         const glm::vec3 newStart = glm::vec3(startPos.x, startPos.y, startPos.z);
         const glm::vec3 newEnd = glm::vec3(endPos.x, endPos.y, endPos.z);
@@ -258,6 +258,7 @@ void TreeStructure::processNode(TreeNode* currNode, Mesh &baseMesh)
             newT.AppendVertex(transform * glm::vec4(oldPts[0], 1.0));
             newT.AppendVertex(transform * glm::vec4(oldPts[1], 1.0));
             newT.AppendVertex(transform * glm::vec4(oldPts[2], 1.0));
+            newT.ComputePlaneNormal();
 
             tris.push_back(newT);
         }
@@ -296,6 +297,7 @@ Mesh TreeStructure::GetTreeMesh(Mesh &baseMesh)
 
     // set tris to traingles of this mesh
     output.SetTriangles(tris);
+    output.SetMinMaxPosFromTris();
 
     return output;
 }

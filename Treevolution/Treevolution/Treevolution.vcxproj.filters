@@ -81,6 +81,9 @@
     <ClCompile Include="src\OpenGL\Drawable.cpp">
       <Filter>Source Files\OpenGL</Filter>
     </ClCompile>
+    <ClCompile Include="src\Scene\DrawablePoints.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\OpenGL\Drawable.h">
@@ -112,6 +115,9 @@
     </ClInclude>
     <ClInclude Include="src\GeneticAlgorithms\TreeStructure.h">
       <Filter>Header Files\GeneticAlgorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scene\DrawablePoints.h">
+      <Filter>Header Files\Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
