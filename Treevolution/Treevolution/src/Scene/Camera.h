@@ -61,7 +61,7 @@ public:
         UpdateAttributes();
     }
     void RotateAboutRight(const float amt) {
-        glm::mat3 rot = glm::mat3(glm::rotate(glm::mat4(1.0f), amt, right)); // TODO: this no work
+        glm::mat3 rot = glm::mat3(glm::rotate(glm::mat4(1.0f), amt, right));
         look = rot * look;
         glm::normalize(look);
         up = rot * up;

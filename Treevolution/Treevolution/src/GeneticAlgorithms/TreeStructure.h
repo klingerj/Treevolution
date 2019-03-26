@@ -33,7 +33,7 @@ public:
 
     // getters
     TreeNode* GetRoot() { return mRoot; }
-    int GetCount() { return nodeList.size(); }
+    size_t GetCount() { return nodeList.size(); }
     TreeNode* GetNodeAtCount(int count) { return nodeList[count]; }
     std::string GetGram() { return mGrammar; }
     float GetMinAngle() { return mMinAngle; }
