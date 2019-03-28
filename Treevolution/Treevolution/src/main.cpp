@@ -110,7 +110,7 @@ int main() {
 
     TreeStructure theTree = TreeStructure(1, iteratedStr, 0.0f, 90.0f, 1.0f, 3.0f);
     TreeStructure theTree2 = TreeStructure(2, iteratedStr, 0.0f, 90.0f, 1.0f, 3.0f);
-    theTree.Crossover(&theTree2);
+    //theTree.Crossover(&theTree2);
     Mesh treeMesh = theTree.GetTreeMesh(branchMesh);
     Mesh treeMesh2 = theTree2.GetTreeMesh(branchMesh);
     treeMesh.Create();
