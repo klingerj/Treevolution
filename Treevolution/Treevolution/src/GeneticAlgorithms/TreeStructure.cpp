@@ -38,7 +38,7 @@ TreeNode::~TreeNode()
 
 TreeStructure::TreeStructure(int id, std::string gram, float minAngle, float maxAngle, 
     float minLen, float maxLen) : mId(id), mGrammar(gram), mMinAngle(minAngle), mMaxAngle(maxAngle),
-    mMinLen(minLen), mMaxLen(maxLen), mRoot(nullptr)
+    mMinLen(minLen), mMaxLen(maxLen), mRoot(nullptr), fitnessScore(0)
 {
     mGenerator.seed(mId);
     mAxisDist = std::uniform_real_distribution<float>(-1.0, 1.0);
@@ -67,7 +67,7 @@ TreeStructure::TreeStructure(TreeStructure* t, TreeNode* root) : mId(t->GetId())
 
 TreeStructure::~TreeStructure()
 {
-    delete mRoot;
+    //if (mRoot) delete mRoot;
 }
 
 void TreeStructure::ConstructTree(TreeNode *root, std::string substring)
@@ -190,18 +190,18 @@ void TreeStructure::Crossover(TreeStructure* parent2)
     // swap the subtrees
     if (idx1 == -1 && idx2 == -1)
     {
-        this->mRoot = subtree2;
-        parent2->SetRoot(subtree1);
+        //this->mRoot = subtree2;
+        //parent2->SetRoot(subtree1);
     }
     else if (idx1 == -1)
     {
-        this->mRoot = subtree2;
-        subtree2->parent->children[idx2] = subtree1;
+        //this->mRoot = subtree2;
+        //subtree2->parent->children[idx2] = subtree1;
     }
     else if (idx2 == -1)
     {
-        subtree1->parent->children[idx1] = subtree2;
-        parent2->SetRoot(subtree1);
+        //subtree1->parent->children[idx1] = subtree2;
+        //parent2->SetRoot(subtree1);
     }
     else
     {
@@ -211,6 +211,12 @@ void TreeStructure::Crossover(TreeStructure* parent2)
         subtree1->parent = subtree2->parent;
         subtree2->parent = temp;
     }
+
+    nodeList.clear();
+    CreateNodeList(mRoot);
+
+    parent2->ClearNodeList();
+    parent2->CreateNodeList(parent2->mRoot);
 }
 
 void TreeStructure::Grow()
@@ -224,12 +230,13 @@ void TreeStructure::Grow()
 
 void TreeStructure::Cut()
 {
+    if (nodeList.size() <= 2) return;
     // get a random node
-    std::uniform_real_distribution<float> chooseDist(0.0, this->nodeList.size());
-    int rand = floor(chooseDist(mGenerator));
+    std::uniform_real_distribution<float> chooseDist(2.0, (float)(this->nodeList.size() - 1));
+    int rand = (int)floor(chooseDist(mGenerator));
     TreeNode* gene = this->GetNodeAtCount(rand);
 
-    if (gene != mRoot)
+    if (gene != mRoot && gene->parent)
     {
         int idx = GetIndexInParentList(gene);
         gene->parent->children.erase(gene->parent->children.begin() + idx);
@@ -244,9 +251,10 @@ void TreeStructure::Cut()
 
 void TreeStructure::Alter()
 {
+    if (nodeList.size() <= 2) return;
     // get a random node
-    std::uniform_real_distribution<float> chooseDist(0.0, this->nodeList.size());
-    int rand = floor(chooseDist(mGenerator));
+    std::uniform_real_distribution<float> chooseDist(2.0, (float)(this->nodeList.size() - 1));
+    int rand = (int)floor(chooseDist(mGenerator));
     TreeNode* gene = this->GetNodeAtCount(rand);
 
     // recompute random parameters
@@ -279,23 +287,25 @@ void TreeStructure::Alter()
     }
 }
 
-void TreeStructure::Mutate()
+int TreeStructure::Mutate()
 {
-    std::uniform_real_distribution<float> chooseDist(0.0, 3.0);
-    float action = chooseDist(mGenerator);
+    std::uniform_real_distribution<float> chooseDist(0.0, 10.0);
+    int action = (int)chooseDist(mGenerator);
 
-    if (action <= 1)
+    if (action < 1)
     {
         Grow();
     }
-    else if (action <= 2)
+    else if (action < 2)
     {
         Cut();
     }
-    else if (action <= 3)
+    else if (action < 3)
     {
         Alter();
     }
+
+    return action;
 }
 
 void TreeStructure::processNode(TreeNode* currNode, Mesh &baseMesh)
@@ -372,8 +382,11 @@ Mesh TreeStructure::GetTreeMesh(Mesh &baseMesh)
     processNode(mRoot, baseMesh);
 
     // set tris to traingles of this mesh
-    output.SetTriangles(tris);
-    output.SetMinMaxPosFromTris();
+    //if (tris.size() > 0) {
+        //std::cout << "Num tris: " << tris.size() << std::endl;
+        output.SetTriangles(tris);
+        output.SetMinMaxPosFromTris();
+    //}
 
     return output;
 }

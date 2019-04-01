@@ -3,7 +3,7 @@
 FitnessEvalMethod::FitnessEvalMethod() {}
 FitnessEvalMethod::~FitnessEvalMethod() {}
 
-VolumetricFitnessEval::VolumetricFitnessEval(float gridCellSize) : gridCellSize(gridCellSize) {}
+VolumetricFitnessEval::VolumetricFitnessEval(float gridCellSize) : gridCellSize(gridCellSize), gridReference(nullptr), gridCurrent(nullptr) {}
 
 VolumetricFitnessEval::~VolumetricFitnessEval() {
     if (gridReference) {
@@ -13,12 +13,14 @@ VolumetricFitnessEval::~VolumetricFitnessEval() {
         delete gridCurrent;
     }
 }
-
+#include <iostream>
 int VolumetricFitnessEval::Evaluate() const {
     int score = 0;
-    for (int i = 0; i < sizeof(*gridReference); ++i) {
-        score += (int)(gridReference[i] == gridCurrent[i]);
+    for (int i = 0; i < (int)std::ceil(gridDim.x * gridDim.y * gridDim.z); ++i) {
+        score += 200 * (int)(gridReference[i] & gridCurrent[i] && gridReference[i]);
+        score -= (int)(gridReference[i] ^ gridCurrent[i]);
     }
+    //std::cout << "Score: " << score << std::endl;
     return score;
 }
 
@@ -33,7 +35,9 @@ void VolumetricFitnessEval::SetGrid(const Mesh& mesh, uint8_t gridType) {
     }
     else
     {
-        gridCurrent = new uint8_t[(int)std::ceil((gridDim.x * gridDim.y * gridDim.z))];
+        if (gridCurrent == nullptr) {
+            gridCurrent = new uint8_t[(int)std::ceil((gridDim.x * gridDim.y * gridDim.z))];
+        }
         grid = gridCurrent;
     }
 

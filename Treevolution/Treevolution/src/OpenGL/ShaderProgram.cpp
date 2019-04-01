@@ -112,3 +112,8 @@ void ShaderProgram::setCameraViewProj(const char* uniformName, const glm::mat4& 
     use();
     glUniformMatrix4fv(glGetUniformLocation(ID, uniformName), 1, GL_FALSE, glm::value_ptr(camViewProj));
 }
+
+void ShaderProgram::SetModelMatrix(const char* uniformName, const glm::mat4& model) {
+    use();
+    glUniformMatrix4fv(glGetUniformLocation(ID, uniformName), 1, GL_FALSE, glm::value_ptr(model));
+}

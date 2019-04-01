@@ -30,6 +30,7 @@ public:
 
 class TreeStructure {
 public:
+    int fitnessScore;
     TreeStructure(int id, std::string gram, float minAngle, float maxAngle, 
         float minLen, float maxLen);
     TreeStructure(TreeStructure* t, TreeNode* root);
@@ -46,6 +47,7 @@ public:
     float GetMinLen() { return mMinLen; }
     float GetMaxLen() { return mMaxLen; }
     void SetRoot(TreeNode* r) { mRoot = r; }
+    void ClearNodeList() { nodeList.clear(); }
 
     void CreateNodeList(TreeNode* root);
 
@@ -61,7 +63,7 @@ public:
     void Grow();
     void Cut();
     void Alter();
-    void Mutate();
+    int Mutate();
 
     // TODO: Free all heap-allocated tree nodes
 
