@@ -23,6 +23,7 @@ public:
     float getDefaultAngle() const;
     float getDefaultStep() const;
     const std::string& getGrammarString() const;
+    std::map<std::string, std::string> getRules() const { return productions; }
 
     // Iterate grammar
     const std::string& getIteration(unsigned int n);

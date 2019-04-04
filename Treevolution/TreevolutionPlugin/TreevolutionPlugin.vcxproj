@@ -26,13 +26,13 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -45,7 +45,7 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -71,7 +71,25 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetExt>.mll</TargetExt>
-    <LibraryPath>$(SolutionDir)\..\Libraries\glfw-3.2.1\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(MAYA_INSTALL_DIR)\lib;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IncludePath>$(MAYA_INSTALL_DIR)\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <TargetExt>.mll</TargetExt>
+    <IncludePath>$(MAYA_INSTALL_DIR)\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(MAYA_INSTALL_DIR)\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <TargetExt>.mll</TargetExt>
+    <IncludePath>$(MAYA_INSTALL_DIR)\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(MAYA_INSTALL_DIR)\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <TargetExt>.mll</TargetExt>
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IncludePath>$(MAYA_INSTALL_DIR)\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(MAYA_INSTALL_DIR)\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -79,12 +97,14 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\Libraries\glm;$(SolutionDir)\..\Libraries\tinyobjloader;$(SolutionDir)\..\Libraries\glfw-3.2.1\include;$(SolutionDir)\..\Libraries\glad\include;$(MAYA_INSTALL_DIR)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NT_PLUGIN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\Libraries\glm;$(MAYA_INSTALL_DIR)\include;$(SolutionDir)\..\Libraries\tinyobjloader;$(SolutionDir)\..\Libraries\glfw-3.2.1\include;$(SolutionDir)\..\Libraries\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NT_PLUGIN;REQUIRE_IOSTREAM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>Foundation.lib;OpenMaya.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(MAYA_INSTALL_DIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>/export:initializePlugin /export:uninitializePlugin  %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -93,7 +113,14 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\Libraries\glm;$(MAYA_INSTALL_DIR)\include;$(SolutionDir)\..\Libraries\tinyobjloader;$(SolutionDir)\..\Libraries\glfw-3.2.1\include;$(SolutionDir)\..\Libraries\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NT_PLUGIN;REQUIRE_IOSTREAM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(MAYA_INSTALL_DIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Foundation.lib;OpenMaya.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/export:initializePlugin /export:uninitializePlugin  %(AdditionalOptions)</AdditionalOptions>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -103,10 +130,15 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\Libraries\glm;$(MAYA_INSTALL_DIR)\include;$(SolutionDir)\..\Libraries\tinyobjloader;$(SolutionDir)\..\Libraries\glfw-3.2.1\include;$(SolutionDir)\..\Libraries\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NT_PLUGIN;REQUIRE_IOSTREAM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(MAYA_INSTALL_DIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Foundation.lib;OpenMaya.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/export:initializePlugin /export:uninitializePlugin  %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -117,35 +149,39 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\Libraries\glm;$(MAYA_INSTALL_DIR)\include;$(SolutionDir)\..\Libraries\tinyobjloader;$(SolutionDir)\..\Libraries\glfw-3.2.1\include;$(SolutionDir)\..\Libraries\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NT_PLUGIN;REQUIRE_IOSTREAM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(MAYA_INSTALL_DIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Foundation.lib;OpenMaya.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/export:initializePlugin /export:uninitializePlugin  %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\Treevolution\src\GeneticAlgorithms\Fitness\FitnessEvalMethod.h" />
-    <ClInclude Include="..\Treevolution\src\GeneticAlgorithms\TreeStructure.h" />
-    <ClInclude Include="..\Treevolution\src\Globals.h" />
-    <ClInclude Include="..\Treevolution\src\LSystem.h" />
-    <ClInclude Include="..\Treevolution\src\OpenGL\Drawable.h" />
-    <ClInclude Include="..\Treevolution\src\Scene\Camera.h" />
-    <ClInclude Include="..\Treevolution\src\Scene\Mesh.h" />
-    <ClInclude Include="..\Treevolution\src\Scene\Raytracing\Raytracing.h" />
-    <ClInclude Include="..\Treevolution\TreevolutionNode.h" />
-    <ClInclude Include="TreevolutionNode.h" />
+    <ClInclude Include="src\GeneticAlgorithms\Fitness\FitnessEvalMethod.h" />
+    <ClInclude Include="src\GeneticAlgorithms\TreeStructure.h" />
+    <ClInclude Include="src\Globals.h" />
+    <ClInclude Include="src\LSystem.h" />
+    <ClInclude Include="src\OpenGL\Drawable.h" />
+    <ClInclude Include="src\Scene\Camera.h" />
+    <ClInclude Include="src\Scene\Mesh.h" />
+    <ClInclude Include="src\Scene\Raytracing\Raytracing.h" />
+    <ClInclude Include="src\TreevolutionNode.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Libraries\glad\src\glad.c" />
-    <ClCompile Include="..\Treevolution\src\GeneticAlgorithms\Fitness\FitnessEvalMethod.cpp" />
-    <ClCompile Include="..\Treevolution\src\GeneticAlgorithms\TreeStructure.cpp" />
-    <ClCompile Include="..\Treevolution\src\LSystem.cpp" />
-    <ClCompile Include="..\Treevolution\src\OpenGL\Drawable.cpp" />
-    <ClCompile Include="..\Treevolution\src\Scene\Camera.cpp" />
-    <ClCompile Include="..\Treevolution\src\Scene\Mesh.cpp" />
-    <ClCompile Include="..\Treevolution\src\Scene\Raytracing\Raytracing.cpp" />
-    <ClCompile Include="PluginMain.cpp" />
-    <ClCompile Include="TreevolutionNode.cpp" />
+    <ClCompile Include="src\GeneticAlgorithms\Fitness\FitnessEvalMethod.cpp" />
+    <ClCompile Include="src\GeneticAlgorithms\TreeStructure.cpp" />
+    <ClCompile Include="src\LSystem.cpp" />
+    <ClCompile Include="src\OpenGL\Drawable.cpp" />
+    <ClCompile Include="src\PluginMain.cpp" />
+    <ClCompile Include="src\Scene\Camera.cpp" />
+    <ClCompile Include="src\Scene\Mesh.cpp" />
+    <ClCompile Include="src\Scene\Raytracing\Raytracing.cpp" />
+    <ClCompile Include="src\TreevolutionNode.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

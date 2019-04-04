@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <stack>
+#include <map>
 #include <random>
 #include <functional>
 #include <glm/glm.hpp>
@@ -58,10 +59,10 @@ public:
 
     // Genetic algoirthm functions
     void Crossover(TreeStructure* parent2);
-    void Grow();
+    void Grow(std::map<std::string, std::string> &rules);
     void Cut();
     void Alter();
-    void Mutate();
+    void Mutate(std::map<std::string, std::string> &rules);
 
     // TODO: Free all heap-allocated tree nodes
 

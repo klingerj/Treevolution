@@ -213,9 +213,24 @@ void TreeStructure::Crossover(TreeStructure* parent2)
     }
 }
 
-void TreeStructure::Grow()
+void TreeStructure::Grow(std::map<std::string, std::string> &rules)
 {
-    // TODO
+    // get a random node
+    std::uniform_real_distribution<float> chooseDist(0.0, this->nodeList.size());
+    int rand = floor(chooseDist(mGenerator));
+    TreeNode* gene = this->GetNodeAtCount(rand);
+
+    // if char of gene has a rule apply it, otherwise add an F
+    std::string s(1, gene->name);
+    if (rules.count(s) > 0)
+    {
+        std::string add = rules[s];
+        ConstructTree(gene, add);
+    }
+    else
+    {
+        AddChildToNode(gene, 'F');
+    }
 
     // repopulate the node list after the change
     nodeList.clear();
@@ -279,14 +294,14 @@ void TreeStructure::Alter()
     }
 }
 
-void TreeStructure::Mutate()
+void TreeStructure::Mutate(std::map<std::string, std::string> &rules)
 {
     std::uniform_real_distribution<float> chooseDist(0.0, 3.0);
     float action = chooseDist(mGenerator);
 
     if (action <= 1)
     {
-        Grow();
+        Grow(rules);
     }
     else if (action <= 2)
     {
