@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Scene">
+      <UniqueIdentifier>{b2b3457c-2e20-4952-b4cc-824003367fe7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\GeneticAlgorithms">
+      <UniqueIdentifier>{5f3fad28-81db-47f3-8f3f-0628c6e59b79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\GeneticAlgorithms\Fitness">
+      <UniqueIdentifier>{29548aed-7ad6-441c-b942-812cd79a920d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scene">
+      <UniqueIdentifier>{f53a6c09-f25e-4643-832f-ce214fe8ad4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GeneticAlgorithms">
+      <UniqueIdentifier>{11f6b135-8a24-41dc-9a90-160a78fe4af1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scene\Raytracing">
+      <UniqueIdentifier>{5d1329e0-dba0-4832-a6d9-4151b2861f77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Scene\Raytracing">
+      <UniqueIdentifier>{51548e42-760f-48d7-9f7e-52f5b9f6873a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GeneticAlgorithms\Fitness">
+      <UniqueIdentifier>{e6fddec7-05fb-43aa-9bbc-c56f7748f811}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\OpenGL">
+      <UniqueIdentifier>{a6177f4c-5e2a-4f25-b0c9-f342ac6e53a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\OpenGL">
+      <UniqueIdentifier>{30fa9fef-785b-470c-91cd-71de29c14c7f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\GeneticAlgorithms\Fitness\FitnessEvalMethod.h">
+      <Filter>Header Files\GeneticAlgorithms\Fitness</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GeneticAlgorithms\TreeStructure.h">
+      <Filter>Header Files\GeneticAlgorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OpenGL\Drawable.h">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scene\Raytracing\Raytracing.h">
+      <Filter>Header Files\Scene\Raytracing</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scene\Camera.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scene\Mesh.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Globals.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TreevolutionNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Libraries\glad\src\glad.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GeneticAlgorithms\Fitness\FitnessEvalMethod.cpp">
+      <Filter>Source Files\GeneticAlgorithms\Fitness</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GeneticAlgorithms\TreeStructure.cpp">
+      <Filter>Source Files\GeneticAlgorithms</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OpenGL\Drawable.cpp">
+      <Filter>Source Files\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\Raytracing\Raytracing.cpp">
+      <Filter>Source Files\Scene\Raytracing</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\Camera.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\Mesh.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PluginMain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TreevolutionNode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

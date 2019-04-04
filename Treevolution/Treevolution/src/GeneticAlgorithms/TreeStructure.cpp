@@ -218,7 +218,6 @@ void TreeStructure::Crossover(TreeStructure* parent2)
     parent2->ClearNodeList();
     parent2->CreateNodeList(parent2->mRoot);
 }
-
 void TreeStructure::Grow(const std::map<std::string, std::string> &rules)
 {
     // get a random node
