@@ -45,31 +45,31 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\GeneticAlgorithms\Fitness\FitnessEvalMethod.h">
+    <ClInclude Include="..\Treevolution\src\GeneticAlgorithms\Fitness\FitnessEvalMethod.h">
       <Filter>Header Files\GeneticAlgorithms\Fitness</Filter>
     </ClInclude>
-    <ClInclude Include="src\GeneticAlgorithms\TreeStructure.h">
+    <ClInclude Include="..\Treevolution\src\GeneticAlgorithms\TreeStructure.h">
       <Filter>Header Files\GeneticAlgorithms</Filter>
     </ClInclude>
-    <ClInclude Include="src\OpenGL\Drawable.h">
+    <ClInclude Include="..\Treevolution\src\OpenGL\Drawable.h">
       <Filter>Header Files\OpenGL</Filter>
     </ClInclude>
-    <ClInclude Include="src\Scene\Raytracing\Raytracing.h">
+    <ClInclude Include="..\Treevolution\src\Scene\Raytracing\Raytracing.h">
       <Filter>Header Files\Scene\Raytracing</Filter>
     </ClInclude>
-    <ClInclude Include="src\Scene\Camera.h">
+    <ClInclude Include="..\Treevolution\src\Scene\Camera.h">
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="src\Scene\Mesh.h">
+    <ClInclude Include="..\Treevolution\src\Scene\Mesh.h">
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="src\Globals.h">
+    <ClInclude Include="..\Treevolution\src\Globals.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\LSystem.h">
+    <ClInclude Include="..\Treevolution\src\LSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\TreevolutionNode.h">
+    <ClInclude Include="..\Treevolution\src\TreevolutionNode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -77,31 +77,31 @@
     <ClCompile Include="..\..\Libraries\glad\src\glad.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\GeneticAlgorithms\Fitness\FitnessEvalMethod.cpp">
+    <ClCompile Include="..\Treevolution\src\GeneticAlgorithms\Fitness\FitnessEvalMethod.cpp">
       <Filter>Source Files\GeneticAlgorithms\Fitness</Filter>
     </ClCompile>
-    <ClCompile Include="src\GeneticAlgorithms\TreeStructure.cpp">
+    <ClCompile Include="..\Treevolution\src\GeneticAlgorithms\TreeStructure.cpp">
       <Filter>Source Files\GeneticAlgorithms</Filter>
     </ClCompile>
-    <ClCompile Include="src\OpenGL\Drawable.cpp">
+    <ClCompile Include="..\Treevolution\src\OpenGL\Drawable.cpp">
       <Filter>Source Files\OpenGL</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scene\Raytracing\Raytracing.cpp">
+    <ClCompile Include="..\Treevolution\src\Scene\Raytracing\Raytracing.cpp">
       <Filter>Source Files\Scene\Raytracing</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scene\Camera.cpp">
+    <ClCompile Include="..\Treevolution\src\Scene\Camera.cpp">
       <Filter>Source Files\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scene\Mesh.cpp">
+    <ClCompile Include="..\Treevolution\src\Scene\Mesh.cpp">
       <Filter>Source Files\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="src\LSystem.cpp">
+    <ClCompile Include="..\Treevolution\src\PluginMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\PluginMain.cpp">
+    <ClCompile Include="..\Treevolution\src\TreevolutionNode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\TreevolutionNode.cpp">
+    <ClCompile Include="..\Treevolution\src\LSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

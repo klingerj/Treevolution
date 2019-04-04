@@ -161,27 +161,27 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\GeneticAlgorithms\Fitness\FitnessEvalMethod.h" />
-    <ClInclude Include="src\GeneticAlgorithms\TreeStructure.h" />
-    <ClInclude Include="src\Globals.h" />
-    <ClInclude Include="src\LSystem.h" />
-    <ClInclude Include="src\OpenGL\Drawable.h" />
-    <ClInclude Include="src\Scene\Camera.h" />
-    <ClInclude Include="src\Scene\Mesh.h" />
-    <ClInclude Include="src\Scene\Raytracing\Raytracing.h" />
-    <ClInclude Include="src\TreevolutionNode.h" />
+    <ClInclude Include="..\Treevolution\src\GeneticAlgorithms\Fitness\FitnessEvalMethod.h" />
+    <ClInclude Include="..\Treevolution\src\GeneticAlgorithms\TreeStructure.h" />
+    <ClInclude Include="..\Treevolution\src\Globals.h" />
+    <ClInclude Include="..\Treevolution\src\LSystem.h" />
+    <ClInclude Include="..\Treevolution\src\OpenGL\Drawable.h" />
+    <ClInclude Include="..\Treevolution\src\Scene\Camera.h" />
+    <ClInclude Include="..\Treevolution\src\Scene\Mesh.h" />
+    <ClInclude Include="..\Treevolution\src\Scene\Raytracing\Raytracing.h" />
+    <ClInclude Include="..\Treevolution\src\TreevolutionNode.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Libraries\glad\src\glad.c" />
-    <ClCompile Include="src\GeneticAlgorithms\Fitness\FitnessEvalMethod.cpp" />
-    <ClCompile Include="src\GeneticAlgorithms\TreeStructure.cpp" />
-    <ClCompile Include="src\LSystem.cpp" />
-    <ClCompile Include="src\OpenGL\Drawable.cpp" />
-    <ClCompile Include="src\PluginMain.cpp" />
-    <ClCompile Include="src\Scene\Camera.cpp" />
-    <ClCompile Include="src\Scene\Mesh.cpp" />
-    <ClCompile Include="src\Scene\Raytracing\Raytracing.cpp" />
-    <ClCompile Include="src\TreevolutionNode.cpp" />
+    <ClCompile Include="..\Treevolution\src\GeneticAlgorithms\Fitness\FitnessEvalMethod.cpp" />
+    <ClCompile Include="..\Treevolution\src\GeneticAlgorithms\TreeStructure.cpp" />
+    <ClCompile Include="..\Treevolution\src\LSystem.cpp" />
+    <ClCompile Include="..\Treevolution\src\OpenGL\Drawable.cpp" />
+    <ClCompile Include="..\Treevolution\src\PluginMain.cpp" />
+    <ClCompile Include="..\Treevolution\src\Scene\Camera.cpp" />
+    <ClCompile Include="..\Treevolution\src\Scene\Mesh.cpp" />
+    <ClCompile Include="..\Treevolution\src\Scene\Raytracing\Raytracing.cpp" />
+    <ClCompile Include="..\Treevolution\src\TreevolutionNode.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
