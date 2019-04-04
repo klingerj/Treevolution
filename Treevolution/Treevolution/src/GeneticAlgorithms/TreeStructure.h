@@ -5,6 +5,7 @@
 #include <stack>
 #include <random>
 #include <functional>
+#include <map>
 #include <glm/glm.hpp>
 
 #include "../Scene/Mesh.h"
@@ -60,10 +61,10 @@ public:
 
     // Genetic algoirthm functions
     void Crossover(TreeStructure* parent2);
-    void Grow();
+    void Grow(const std::map<std::string, std::string> &rules);
     void Cut();
     void Alter();
-    int Mutate();
+    int Mutate(const std::map<std::string, std::string> &rules);
 
     // TODO: Free all heap-allocated tree nodes
 

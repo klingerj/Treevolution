@@ -19,7 +19,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 }
 
 Camera camera = Camera(glm::vec3(0, 0, 2), glm::vec3(0, 0, 0), 0.7853981634f, 1.3333f, 0.01f, 100.0f);
-const float camMoveSensitivity = 0.01f;
+const float camMoveSensitivity = 0.02f;
 
 void processInput(GLFWwindow *window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
@@ -102,7 +102,7 @@ int main() {
 	  sys.setDefaultStep(0.1f);
 	  sys.setDefaultAngle(30.0f);
 	  sys.loadProgramFromString("F\nF->F[+F][-F]"); //taken from simple1.txt
-    std::string iteratedStr = sys.getIteration(1);
+    std::string iteratedStr = sys.getIteration(2);
 
     /*TreeStructure theTree = TreeStructure(1, iteratedStr, 0.0f, 90.0f, 1.0f, 3.0f);
     TreeStructure theTree2 = TreeStructure(2, iteratedStr, 0.0f, 90.0f, 1.0f, 3.0f);
@@ -114,10 +114,10 @@ int main() {
 
     // Load reference model
     Mesh referenceMesh = Mesh();
-    referenceMesh.LoadFromFile("res/models/tallBoi.obj");
+    referenceMesh.LoadFromFile("res/models/complexBoi.obj");
 
     // Volumetric fitness evaluation
-    FitnessEvalMethod* eval = new VolumetricFitnessEval(0.2f);
+    FitnessEvalMethod* eval = new VolumetricFitnessEval(0.22f);
     VolumetricFitnessEval* volumetricEval = dynamic_cast<VolumetricFitnessEval*>(eval);
     volumetricEval->SetGrid(referenceMesh, 0);
 
@@ -139,13 +139,13 @@ int main() {
     constexpr int popSize = 200;
     population.reserve(popSize * 2);
     for (int i = 0; i < popSize; ++i) {
-        population.emplace_back(std::move(TreeStructure(i, iteratedStr, 0.0f, 180.0f, 1.0f, 3.0f)));
+        population.emplace_back(std::move(TreeStructure(i, iteratedStr, 0.0f, 90.0f, 1.0f, 3.0f)));
     }
 
     std::vector<TreeStructure> newPopulation;
     newPopulation.reserve(popSize * 2);
 
-    constexpr int numGenerations = 20;
+    constexpr int numGenerations = 50;
     for (int i = 0; i < numGenerations; ++i) {
         std::cout << "New Generation: " << i << std::endl;
         // Compute fitness scores
@@ -153,7 +153,7 @@ int main() {
             //std::cout << "Handling pop member: " << j << std::endl;
             Mesh treeMesh = population[j].GetTreeMesh(branchMesh); // Get the current pop member's mesh
             if (treeMesh.GetTriangles().size() == 0) {
-                population[j].fitnessScore = 0;
+                population[j].fitnessScore = -9999999999;
                 continue;
             }
             else {
@@ -177,8 +177,8 @@ int main() {
         for (int r = elitism; r - elitism < popSize - elitism; r += 2) {
             TreeStructure& par1 = population[r];
             TreeStructure& par2 = population[r + 1];
-            int m1 = par1.Mutate();
-            int m2 = par2.Mutate();
+            int m1 = par1.Mutate(sys.getRules());
+            int m2 = par2.Mutate(sys.getRules());
             if (m1 >= 3 && m2 >= 3) { // neither parent mutated
                 par1.Crossover(&par2);
             }
@@ -190,11 +190,19 @@ int main() {
 
     std::vector<Mesh> treeMeshes;
     for (int i = 0; i < elitism; ++i) {
+        std::cout << "Fitness: " << population[i].fitnessScore << std::endl;
         treeMeshes.push_back(population[i].GetTreeMesh(branchMesh));
         treeMeshes[i].Create();
     }
 
-    //glPointSize(4);
+    DrawablePoints gridPoints;
+    std::vector<glm::vec3> points = volumetricEval->GetGridPoints(0);
+    for (auto p : points) {
+        gridPoints.addPoint(p);
+    }
+    std::cout << "num points: " << points.size() << std::endl;
+    gridPoints.Create();
+    glPointSize(4);
 
     while (!glfwWindowShouldClose(window)) {
         // Input handling
@@ -214,9 +222,8 @@ int main() {
             model = glm::translate(glm::mat4(1.0f), glm::vec3(4.0f * i, 0.0, 0.0f));
             flatShader.SetModelMatrix("model", model);
             flatShader.Draw(treeMeshes[i]);
+            flatShader.Draw(gridPoints);
         }
-
-        //flatShader.Draw(gridPoints);
 
         // Check/call events, swap buffers
         glfwPollEvents();

@@ -73,7 +73,6 @@ void Mesh::SetTriangles(std::vector<Triangle>& t)
     // Loop over triangles
     size_t index_offset = 0;
     for (size_t f = 0; f < triangles.size(); ++f) {
-        
         Triangle tr = triangles[f];
         tr.ComputePlaneNormal();
         std::vector<glm::vec3> trPts = tr.GetPoints();
@@ -96,7 +95,7 @@ void Mesh::SetTriangles(std::vector<Triangle>& t)
     }
 }
 
-//https://stackoverflow.com/questions/17333/what-is-the-most-effective-way-for-float-and-double-comparison
+// https://stackoverflow.com/questions/17333/what-is-the-most-effective-way-for-float-and-double-comparison
 bool combinedToleranceCompare(float x, float y)
 {
     const float maxXYOne = std::max({ 1.0f, std::fabsf(x) , std::fabsf(y) });

@@ -219,9 +219,24 @@ void TreeStructure::Crossover(TreeStructure* parent2)
     parent2->CreateNodeList(parent2->mRoot);
 }
 
-void TreeStructure::Grow()
+void TreeStructure::Grow(const std::map<std::string, std::string> &rules)
 {
-    // TODO
+    // get a random node
+    std::uniform_real_distribution<float> chooseDist(0.0f, (float)(this->nodeList.size()));
+    int rand = (int)floor(chooseDist(mGenerator));
+    TreeNode* gene = this->GetNodeAtCount(rand);
+
+    // if char of gene has a rule apply it, otherwise add an F
+    std::string s(1, gene->name);
+    if (rules.count(s) > 0)
+    {
+        std::string add = rules.at(s);
+        ConstructTree(gene, add);
+    }
+    else
+    {
+        AddChildToNode(gene, 'F');
+    }
 
     // repopulate the node list after the change
     nodeList.clear();
@@ -287,14 +302,14 @@ void TreeStructure::Alter()
     }
 }
 
-int TreeStructure::Mutate()
+int TreeStructure::Mutate(const std::map<std::string, std::string> &rules)
 {
     std::uniform_real_distribution<float> chooseDist(0.0, 10.0);
     int action = (int)chooseDist(mGenerator);
 
     if (action < 1)
     {
-        Grow();
+        Grow(rules);
     }
     else if (action < 2)
     {
@@ -320,7 +335,7 @@ void TreeStructure::processNode(TreeNode* currNode, Mesh &baseMesh)
 
         // find the scale and translation of the branch geometry
         const float dist = glm::length(startPos - endPos);
-        const float radius = 0.1f;
+        const float radius = 0.3f;
         const glm::mat4 scale = glm::scale(glm::mat4(1.0), glm::vec3(radius, dist, radius));
         
         const glm::vec3 newStart = glm::vec3(startPos.x, startPos.y, startPos.z);
