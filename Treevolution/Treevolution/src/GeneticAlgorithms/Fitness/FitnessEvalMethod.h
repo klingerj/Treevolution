@@ -26,7 +26,9 @@ private:
 
     float gridCellSize;
     glm::vec3 gridDim;
+    glm::vec3 gridDimCurrent;
     glm::vec3 gridMin;
+    glm::vec3 gridMinCurrent;
 
 public:
     VolumetricFitnessEval(float gridCellSize);

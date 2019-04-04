@@ -28,6 +28,8 @@ public:
     // Iterate grammar
     const std::string& getIteration(unsigned int n);
 
+    std::map<std::string, std::string> getRules() const { return productions; }
+
     // Get geometry from running the turtle
     void process(unsigned int n,
         std::vector<Branch>& branches);

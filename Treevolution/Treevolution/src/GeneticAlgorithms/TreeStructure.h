@@ -6,6 +6,7 @@
 #include <map>
 #include <random>
 #include <functional>
+#include <map>
 #include <glm/glm.hpp>
 
 #include "../Scene/Mesh.h"
@@ -31,6 +32,7 @@ public:
 
 class TreeStructure {
 public:
+    int fitnessScore;
     TreeStructure(int id, std::string gram, float minAngle, float maxAngle, 
         float minLen, float maxLen);
     TreeStructure(TreeStructure* t, TreeNode* root);
@@ -47,6 +49,7 @@ public:
     float GetMinLen() { return mMinLen; }
     float GetMaxLen() { return mMaxLen; }
     void SetRoot(TreeNode* r) { mRoot = r; }
+    void ClearNodeList() { nodeList.clear(); }
 
     void CreateNodeList(TreeNode* root);
 
@@ -59,10 +62,10 @@ public:
 
     // Genetic algoirthm functions
     void Crossover(TreeStructure* parent2);
-    void Grow(std::map<std::string, std::string> &rules);
+    void Grow(const std::map<std::string, std::string> &rules);
     void Cut();
     void Alter();
-    void Mutate(std::map<std::string, std::string> &rules);
+    int Mutate(const std::map<std::string, std::string> &rules);
 
     // TODO: Free all heap-allocated tree nodes
 

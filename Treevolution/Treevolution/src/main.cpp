@@ -1,6 +1,7 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 #include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 
 #include "OpenGL/ShaderProgram.h"
 #include "Scene/DrawableLine.h"
@@ -18,7 +19,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 }
 
 Camera camera = Camera(glm::vec3(0, 0, 2), glm::vec3(0, 0, 0), 0.7853981634f, 1.3333f, 0.01f, 100.0f);
-const float camMoveSensitivity = 0.01f;
+const float camMoveSensitivity = 0.02f;
 
 void processInput(GLFWwindow *window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
@@ -91,11 +92,6 @@ int main() {
     glBindVertexArray(VAO);
 
     // Scene data
-    //DrawableLine lines = DrawableLine();
-    //Line l;
-    //l.start = glm::vec3(0.0f, 0.0f, 0.0f);
-    //l.end = glm::vec3(0.0f, 0.5f, 0.0f);
-    //lines.addLineSegment(l);
     
     // Load base branch model
     Mesh branchMesh = Mesh();
@@ -106,35 +102,107 @@ int main() {
 	  sys.setDefaultStep(0.1f);
 	  sys.setDefaultAngle(30.0f);
 	  sys.loadProgramFromString("F\nF->F[+F][-F]"); //taken from simple1.txt
-    std::string iteratedStr = sys.getIteration(1);
+    std::string iteratedStr = sys.getIteration(2);
 
-    TreeStructure theTree = TreeStructure(1, iteratedStr, 0.0f, 90.0f, 1.0f, 3.0f);
+    /*TreeStructure theTree = TreeStructure(1, iteratedStr, 0.0f, 90.0f, 1.0f, 3.0f);
     TreeStructure theTree2 = TreeStructure(2, iteratedStr, 0.0f, 90.0f, 1.0f, 3.0f);
     //theTree.Crossover(&theTree2);
     Mesh treeMesh = theTree.GetTreeMesh(branchMesh);
     Mesh treeMesh2 = theTree2.GetTreeMesh(branchMesh);
     treeMesh.Create();
-    treeMesh2.Create();
+    treeMesh2.Create();*/
 
     // Load reference model
-    /*Mesh referenceMesh = Mesh();
-    referenceMesh.LoadFromFile("res/models/cubeOrigin5.obj");
+    Mesh referenceMesh = Mesh();
+    referenceMesh.LoadFromFile("res/models/complexBoi.obj");
 
     // Volumetric fitness evaluation
-    FitnessEvalMethod* eval = new VolumetricFitnessEval(0.1f);
+    FitnessEvalMethod* eval = new VolumetricFitnessEval(0.22f);
     VolumetricFitnessEval* volumetricEval = dynamic_cast<VolumetricFitnessEval*>(eval);
     volumetricEval->SetGrid(referenceMesh, 0);
-    volumetricEval->SetGrid(treeMesh, 1);
+
+
+    //volumetricEval->SetGrid(treeMesh, 1);
     // TODO: better way to do this other than dynamic casting?
 
-    DrawablePoints gridPoints;
+    /*DrawablePoints gridPoints;
     std::vector<glm::vec3> points = volumetricEval->GetGridPoints(1);
     for (auto p : points) {
         gridPoints.addPoint(p);
     }
-    gridPoints.Create();
+    gridPoints.Create();*/
 
-    glPointSize(4);*/
+    
+
+    const int elitism = 40; // must be even!!!!!!
+    std::vector<TreeStructure> population;
+    constexpr int popSize = 200;
+    population.reserve(popSize * 2);
+    for (int i = 0; i < popSize; ++i) {
+        population.emplace_back(std::move(TreeStructure(i, iteratedStr, 0.0f, 90.0f, 1.0f, 3.0f)));
+    }
+
+    std::vector<TreeStructure> newPopulation;
+    newPopulation.reserve(popSize * 2);
+
+    constexpr int numGenerations = 50;
+    for (int i = 0; i < numGenerations; ++i) {
+        std::cout << "New Generation: " << i << std::endl;
+        // Compute fitness scores
+        for (int j = 0; j < popSize; ++j) {
+            //std::cout << "Handling pop member: " << j << std::endl;
+            Mesh treeMesh = population[j].GetTreeMesh(branchMesh); // Get the current pop member's mesh
+            if (treeMesh.GetTriangles().size() == 0) {
+                population[j].fitnessScore = -9999999999;
+                continue;
+            }
+            else {
+                volumetricEval->SetGrid(treeMesh, 1); // set the grid points
+                population[j].fitnessScore = volumetricEval->Evaluate(); // get the evaluated score
+                // TODO: simplify the above to a single function call
+            }
+        }
+        
+        // Sort based on fitness
+        std::sort(population.begin(), population.end(), [](TreeStructure& a, TreeStructure& b) { return a.fitnessScore > b.fitnessScore; });
+
+        newPopulation.clear();
+
+        // Elitism
+        for (int e = 0; e < elitism; ++e) {
+            newPopulation.push_back(population[e]);
+        }
+
+        // Crossover/Mutation
+        for (int r = elitism; r - elitism < popSize - elitism; r += 2) {
+            TreeStructure& par1 = population[r];
+            TreeStructure& par2 = population[r + 1];
+            int m1 = par1.Mutate(sys.getRules());
+            int m2 = par2.Mutate(sys.getRules());
+            if (m1 >= 3 && m2 >= 3) { // neither parent mutated
+                par1.Crossover(&par2);
+            }
+            newPopulation.push_back(par1);
+            newPopulation.push_back(par2);
+        }
+        population = newPopulation;
+    }
+
+    std::vector<Mesh> treeMeshes;
+    for (int i = 0; i < elitism; ++i) {
+        std::cout << "Fitness: " << population[i].fitnessScore << std::endl;
+        treeMeshes.push_back(population[i].GetTreeMesh(branchMesh));
+        treeMeshes[i].Create();
+    }
+
+    DrawablePoints gridPoints;
+    std::vector<glm::vec3> points = volumetricEval->GetGridPoints(0);
+    for (auto p : points) {
+        gridPoints.addPoint(p);
+    }
+    std::cout << "num points: " << points.size() << std::endl;
+    gridPoints.Create();
+    glPointSize(4);
 
     while (!glfwWindowShouldClose(window)) {
         // Input handling
@@ -145,9 +213,17 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT);
 
         // Draw the scene
+
+        // Model matrices
         flatShader.setCameraViewProj("cameraViewProj", camera.GetViewProj());
-        flatShader.Draw(treeMesh);
-        //flatShader.Draw(gridPoints);
+        glm::mat4 model = glm::mat4(1.0f);
+        
+        for (int i = 0; i < elitism; ++i) {
+            model = glm::translate(glm::mat4(1.0f), glm::vec3(4.0f * i, 0.0, 0.0f));
+            flatShader.SetModelMatrix("model", model);
+            flatShader.Draw(treeMeshes[i]);
+            flatShader.Draw(gridPoints);
+        }
 
         // Check/call events, swap buffers
         glfwPollEvents();
@@ -158,7 +234,9 @@ int main() {
     glDeleteVertexArrays(1, &VAO);
     //lines.destroy();
     //referenceMesh.destroy();
-    treeMesh.destroy();
+    for (int i = 0; i < elitism; ++i) {
+        treeMeshes[i].destroy();
+    }
     glfwTerminate();
 
     exit(EXIT_SUCCESS);

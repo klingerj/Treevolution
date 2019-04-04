@@ -20,4 +20,5 @@ public:
     void use() const { glUseProgram(ID); } // Use this ShaderProgram
     void Draw(Drawable& d);
     void setCameraViewProj(const char* uniformName, const glm::mat4& camViewProj); // Set the camera VP Matrix uniform
+    void SetModelMatrix(const char* uniformName, const glm::mat4& model); // Set the model matrix uniform
 };
