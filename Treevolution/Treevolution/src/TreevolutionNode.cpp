@@ -6,6 +6,7 @@
 
 MTypeId TreevolutionNode::id(0x80000);
 MObject TreevolutionNode::meshString;
+MObject TreevolutionNode::numPreview;
 MObject TreevolutionNode::outputMesh;
 // more GUI variables
 
@@ -22,6 +23,7 @@ MStatus TreevolutionNode::initialize()
     MFnTypedAttribute gramAttr;
     MFnUnitAttribute timeAttr;*/
     MFnTypedAttribute inMeshAttr;
+    MFnNumericAttribute nPrevAttr;
     MFnTypedAttribute meshAttr;
 
     MStatus returnStatus;
@@ -47,6 +49,10 @@ MStatus TreevolutionNode::initialize()
         MFnData::kString,
         &returnStatus);
 
+    TreevolutionNode::numPreview = nPrevAttr.create("numPreview", "np",
+        MFnNumericData::kInt, 1,
+        &returnStatus);
+
     TreevolutionNode::outputMesh = meshAttr.create("outputMesh", "out",
         MFnData::kMesh,
         &returnStatus);
@@ -57,6 +63,7 @@ MStatus TreevolutionNode::initialize()
     returnStatus = addAttribute(LSystemNode::grammar);
     returnStatus = addAttribute(LSystemNode::time);*/
     returnStatus = addAttribute(TreevolutionNode::meshString);
+    returnStatus = addAttribute(TreevolutionNode::numPreview);
     returnStatus = addAttribute(TreevolutionNode::outputMesh);
 
     // attribute affects
@@ -68,6 +75,8 @@ MStatus TreevolutionNode::initialize()
         LSystemNode::outputGeom);
     returnStatus = attributeAffects(LSystemNode::time,
         LSystemNode::outputGeom);*/
+    returnStatus = attributeAffects(TreevolutionNode::numPreview,
+        TreevolutionNode::outputMesh);
     returnStatus = attributeAffects(TreevolutionNode::meshString,
         TreevolutionNode::outputMesh);
 
@@ -93,12 +102,13 @@ MStatus TreevolutionNode::compute(const MPlug& plug, MDataBlock& data)
 
         MDataHandle inMeshData = data.inputValue(meshString, &returnStatus);
         MString meshStr = inMeshData.asString();
+        MDataHandle nData = data.inputValue(numPreview, &returnStatus);
         MDataHandle outputHandle = data.outputValue(outputMesh, &returnStatus);
 
         MFnMeshData dataCreator;
         MObject newOutputData = dataCreator.create(&returnStatus);
 
-        createMesh(newOutputData, meshStr, returnStatus);
+        createMesh(newOutputData, meshStr, nData.asInt(), returnStatus);
 
         outputHandle.set(newOutputData);
         data.setClean(plug);
@@ -109,7 +119,7 @@ MStatus TreevolutionNode::compute(const MPlug& plug, MDataBlock& data)
     return MS::kSuccess;
 }
 
-MObject TreevolutionNode::createMesh(MObject& outData, const MString& meshStr, MStatus& stat)
+MObject TreevolutionNode::createMesh(MObject& outData, const MString& meshStr, const int nPrev, MStatus& stat)
 {
     // DO MAIN
     MGlobal::displayInfo(MString("IN CREATE"));
@@ -135,7 +145,10 @@ MObject TreevolutionNode::createMesh(MObject& outData, const MString& meshStr, M
     MPointArray points;
     MIntArray faceCounts;
     MIntArray faceConnects;
+
+    MString uniteCmd = MString("polyUnite -n result ");
     int start = 0;
+    int count = 0;
     for (Triangle t : treeMesh.GetTriangles())
     {
         std::vector<glm::vec3> pts = t.GetPoints();
@@ -150,7 +163,18 @@ MObject TreevolutionNode::createMesh(MObject& outData, const MString& meshStr, M
             faceConnects.append(i + start);
         }
         start += 3;
+
+        MString poly = MString("polyCreateFacet -n plg") + count + MString(" ");
+        poly = poly + MString("-p ") + pts[0][0] + MString(" ") + pts[0][1] + MString(" ") + pts[0][2] + MString(" ");
+        poly = poly + MString("-p ") + pts[1][0] + MString(" ") + pts[1][1] + MString(" ") + pts[1][2] + MString(" ");
+        poly = poly + MString("-p ") + pts[2][0] + MString(" ") + pts[2][1] + MString(" ") + pts[2][2] + MString(";");
+
+        uniteCmd = uniteCmd + MString("plg") + count + MString(" ");
+
+        MGlobal::executeCommand(poly);
+        count++;
     }
+    MGlobal::executeCommand(uniteCmd);
 
     MFnMesh	meshFS;
     return meshFS.create(points.length(), faceCounts.length(),

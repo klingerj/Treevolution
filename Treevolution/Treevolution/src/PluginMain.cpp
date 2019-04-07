@@ -60,7 +60,7 @@ MStatus uninitializePlugin(MObject obj)
         return status;
     }
 
-    //MGlobal::executeCommand("deleteUI -m $menu;");
+    MGlobal::executeCommand("deleteUI -m $menu;");
 
     return status;
 }
