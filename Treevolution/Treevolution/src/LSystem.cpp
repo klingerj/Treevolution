@@ -131,6 +131,7 @@ std::string LSystem::iterate(const std::string& input)
     //for each sym in current state, replace the sym
 }
 
+std::map<std::string, std::string> LSystem::getRules() const { return productions; }
 
 LSystem::Turtle::Turtle() :
     pos(0, 0, 0),

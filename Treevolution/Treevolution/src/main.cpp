@@ -153,7 +153,7 @@ int main() {
             //std::cout << "Handling pop member: " << j << std::endl;
             Mesh treeMesh = population[j].GetTreeMesh(branchMesh); // Get the current pop member's mesh
             if (treeMesh.GetTriangles().size() == 0) {
-                population[j].fitnessScore = -9999999999;
+                population[j].fitnessScore = -9999999;
                 continue;
             }
             else {
