@@ -180,6 +180,9 @@ int GetIndexInParentList(TreeNode* node)
 void TreeStructure::Crossover(TreeStructure* parent2)
 {
     // get a random node from both this and parent2
+    if (nodeList.size() == 0 || parent2->nodeList.size() == 0) {
+        return;
+    }
     int rand1 = std::rand() % this->nodeList.size();
     int rand2 = std::rand() % parent2->GetCount();
     TreeNode* subtree1 = this->GetNodeAtCount(rand1);
@@ -220,6 +223,9 @@ void TreeStructure::Crossover(TreeStructure* parent2)
 }
 void TreeStructure::Grow(const std::map<std::string, std::string> &rules)
 {
+    if (nodeList.size() == 0) {
+        return;
+    }
     // get a random node
     std::uniform_real_distribution<float> chooseDist(0.0f, (float)(this->nodeList.size()));
     int rand = (int)floor(chooseDist(mGenerator));

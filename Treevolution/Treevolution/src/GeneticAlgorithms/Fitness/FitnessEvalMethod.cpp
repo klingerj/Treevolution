@@ -33,7 +33,7 @@ int VolumetricFitnessEval::Evaluate() const {
                 const glm::vec3 gridMaxRef = gridMin + gridDim * gridCellSize;
                 if (center.x < gridMin.x || center.y < gridMin.y || center.z < gridMin.z ||
                     center.x > gridMaxRef.x || center.y > gridMaxRef.y || center.z > gridMaxRef.z) {
-                    score--;
+                    score -= 4;
                 } else {
                     glm::vec3 index = glm::round((center - gridMin) / gridCellSize);
                     int idxRef = (int)(index.z + index.y * gridDim.z + index.x * gridDim.z * gridDim.y);
@@ -41,7 +41,7 @@ int VolumetricFitnessEval::Evaluate() const {
                         score += 100;
                     }
                     else if ((gridReference[idxRef] ^ gridCurrent[idx])) {
-                        score--;
+                        score--; // score -= 3;
                     }
                 }
 

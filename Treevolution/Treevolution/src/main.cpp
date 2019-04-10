@@ -20,6 +20,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 
 Camera camera = Camera(glm::vec3(0, 0, 2), glm::vec3(0, 0, 0), 0.7853981634f, 1.3333f, 0.01f, 100.0f);
 const float camMoveSensitivity = 0.02f;
+bool showGridPoints = true;
 
 void processInput(GLFWwindow *window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
@@ -58,6 +59,12 @@ void processInput(GLFWwindow *window) {
     }
     else if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
         camera.TranslateAlongUp(camMoveSensitivity);
+    }
+    else if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
+        showGridPoints = true;
+    }
+    else if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS) {
+        showGridPoints = false;
     }
 }
 
@@ -114,10 +121,10 @@ int main() {
 
     // Load reference model
     Mesh referenceMesh = Mesh();
-    referenceMesh.LoadFromFile("res/models/complexBoi.obj");
+    referenceMesh.LoadFromFile("res/models/cone.obj");
 
     // Volumetric fitness evaluation
-    FitnessEvalMethod* eval = new VolumetricFitnessEval(0.22f);
+    FitnessEvalMethod* eval = new VolumetricFitnessEval(0.5f);
     VolumetricFitnessEval* volumetricEval = dynamic_cast<VolumetricFitnessEval*>(eval);
     volumetricEval->SetGrid(referenceMesh, 0);
 
@@ -134,18 +141,18 @@ int main() {
 
     
 
-    const int elitism = 40; // must be even!!!!!!
+    const int elitism = 20; // must be even!!!!!!
     std::vector<TreeStructure> population;
-    constexpr int popSize = 200;
-    population.reserve(popSize * 2);
+    constexpr int popSize = 100;
+    population.reserve(popSize);
     for (int i = 0; i < popSize; ++i) {
-        population.emplace_back(std::move(TreeStructure(i, iteratedStr, 0.0f, 90.0f, 1.0f, 3.0f)));
+        population.emplace_back(std::move(TreeStructure(i, iteratedStr, 0.0f, 120.0f, 1.0f, 3.0f)));
     }
 
     std::vector<TreeStructure> newPopulation;
-    newPopulation.reserve(popSize * 2);
+    newPopulation.reserve(popSize);
 
-    constexpr int numGenerations = 50;
+    constexpr int numGenerations = 240;
     for (int i = 0; i < numGenerations; ++i) {
         std::cout << "New Generation: " << i << std::endl;
         // Compute fitness scores
@@ -171,12 +178,19 @@ int main() {
         // Elitism
         for (int e = 0; e < elitism; ++e) {
             newPopulation.push_back(population[e]);
+            population.erase(population.begin() + e);
         }
 
         // Crossover/Mutation
-        for (int r = elitism; r - elitism < popSize - elitism; r += 2) {
-            TreeStructure& par1 = population[r];
-            TreeStructure& par2 = population[r + 1];
+        while (population.size() > 0) {
+            const int randPar1 = rand() % (population.size() - 1);
+            TreeStructure par1 = population[randPar1];
+            population.erase(population.begin() + randPar1);
+
+            const int randPar2 = population.size() == 1 ? 0 : rand() % (population.size() - 1);
+            TreeStructure par2 = population[randPar2];
+            population.erase(population.begin() + randPar2);
+
             int m1 = par1.Mutate(sys.getRules());
             int m2 = par2.Mutate(sys.getRules());
             if (m1 >= 3 && m2 >= 3) { // neither parent mutated
@@ -219,10 +233,12 @@ int main() {
         glm::mat4 model = glm::mat4(1.0f);
         
         for (int i = 0; i < elitism; ++i) {
-            model = glm::translate(glm::mat4(1.0f), glm::vec3(4.0f * i, 0.0, 0.0f));
+            model = glm::translate(glm::mat4(1.0f), glm::vec3(8.0f * i, 0.0, 0.0f));
             flatShader.SetModelMatrix("model", model);
             flatShader.Draw(treeMeshes[i]);
-            flatShader.Draw(gridPoints);
+            if (showGridPoints) {
+                flatShader.Draw(gridPoints);
+            }
         }
 
         // Check/call events, swap buffers
@@ -237,6 +253,7 @@ int main() {
     for (int i = 0; i < elitism; ++i) {
         treeMeshes[i].destroy();
     }
+    gridPoints.destroy();
     glfwTerminate();
 
     exit(EXIT_SUCCESS);
