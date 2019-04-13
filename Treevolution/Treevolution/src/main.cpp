@@ -109,7 +109,7 @@ int main() {
 	  sys.setDefaultStep(0.1f);
 	  sys.setDefaultAngle(30.0f);
 	  sys.loadProgramFromString("F\nF->F[+F][-F]"); //taken from simple1.txt
-    std::string iteratedStr = sys.getIteration(2);
+    std::string iteratedStr = sys.getIteration(3);
 
     /*TreeStructure theTree = TreeStructure(1, iteratedStr, 0.0f, 90.0f, 1.0f, 3.0f);
     TreeStructure theTree2 = TreeStructure(2, iteratedStr, 0.0f, 90.0f, 1.0f, 3.0f);
@@ -121,10 +121,10 @@ int main() {
 
     // Load reference model
     Mesh referenceMesh = Mesh();
-    referenceMesh.LoadFromFile("res/models/cone.obj");
+    referenceMesh.LoadFromFile("res/models/tallestBoi.obj");
 
     // Volumetric fitness evaluation
-    FitnessEvalMethod* eval = new VolumetricFitnessEval(0.5f);
+    FitnessEvalMethod* eval = new VolumetricFitnessEval(0.4f);
     VolumetricFitnessEval* volumetricEval = dynamic_cast<VolumetricFitnessEval*>(eval);
     volumetricEval->SetGrid(referenceMesh, 0);
 
@@ -141,9 +141,9 @@ int main() {
 
     
 
-    const int elitism = 20; // must be even!!!!!!
+    const int elitism = 12; // must be even!!!!!!
     std::vector<TreeStructure> population;
-    constexpr int popSize = 100;
+    constexpr int popSize = 60;
     population.reserve(popSize);
     for (int i = 0; i < popSize; ++i) {
         population.emplace_back(std::move(TreeStructure(i, iteratedStr, 0.0f, 120.0f, 1.0f, 3.0f)));
@@ -152,7 +152,7 @@ int main() {
     std::vector<TreeStructure> newPopulation;
     newPopulation.reserve(popSize);
 
-    constexpr int numGenerations = 240;
+    constexpr int numGenerations = 4;
     for (int i = 0; i < numGenerations; ++i) {
         std::cout << "New Generation: " << i << std::endl;
         // Compute fitness scores
@@ -176,7 +176,7 @@ int main() {
         newPopulation.clear();
 
         // Elitism
-        for (int e = 0; e < elitism; ++e) {
+        /*for (int e = 0; e < elitism; ++e) {
             newPopulation.push_back(population[e]);
             population.erase(population.begin() + e);
         }
@@ -191,6 +191,23 @@ int main() {
             TreeStructure par2 = population[randPar2];
             population.erase(population.begin() + randPar2);
 
+            int m1 = par1.Mutate(sys.getRules());
+            int m2 = par2.Mutate(sys.getRules());
+            if (m1 >= 3 && m2 >= 3) { // neither parent mutated
+                par1.Crossover(&par2);
+            }
+            newPopulation.push_back(par1);
+            newPopulation.push_back(par2);
+        }*/
+
+        for (int e = 0; e < elitism; ++e) {
+            newPopulation.push_back(population[e]);
+        }
+
+        // Crossover/Mutation
+        for (int r = elitism; r - elitism < popSize - elitism; r += 2) {
+            TreeStructure& par1 = population[r];
+            TreeStructure& par2 = population[r + 1];
             int m1 = par1.Mutate(sys.getRules());
             int m2 = par2.Mutate(sys.getRules());
             if (m1 >= 3 && m2 >= 3) { // neither parent mutated
@@ -216,7 +233,7 @@ int main() {
     }
     std::cout << "num points: " << points.size() << std::endl;
     gridPoints.Create();
-    glPointSize(4);
+    glPointSize(3);
 
     while (!glfwWindowShouldClose(window)) {
         // Input handling
@@ -233,7 +250,7 @@ int main() {
         glm::mat4 model = glm::mat4(1.0f);
         
         for (int i = 0; i < elitism; ++i) {
-            model = glm::translate(glm::mat4(1.0f), glm::vec3(8.0f * i, 0.0, 0.0f));
+            model = glm::translate(glm::mat4(1.0f), glm::vec3(15.0f * i, 0.0, 0.0f));
             flatShader.SetModelMatrix("model", model);
             flatShader.Draw(treeMeshes[i]);
             if (showGridPoints) {

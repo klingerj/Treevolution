@@ -13,7 +13,7 @@ VolumetricFitnessEval::~VolumetricFitnessEval() {
         delete gridCurrent;
     }
 }
-
+#include <iostream>
 int VolumetricFitnessEval::Evaluate() const {
     int score = 0;
     /*for (int i = 0; i < (int)std::ceil(gridDimCurrent.x * gridDimCurrent.y * gridDimCurrent.z); ++i) {
@@ -33,12 +33,13 @@ int VolumetricFitnessEval::Evaluate() const {
                 const glm::vec3 gridMaxRef = gridMin + gridDim * gridCellSize;
                 if (center.x < gridMin.x || center.y < gridMin.y || center.z < gridMin.z ||
                     center.x > gridMaxRef.x || center.y > gridMaxRef.y || center.z > gridMaxRef.z) {
-                    score -= 4;
+                    score -= 2;
+                    std::cout << "here" << std::endl;
                 } else {
                     glm::vec3 index = glm::round((center - gridMin) / gridCellSize);
                     int idxRef = (int)(index.z + index.y * gridDim.z + index.x * gridDim.z * gridDim.y);
                     if (gridCurrent[idx] == gridReference[idxRef] && gridCurrent[idx] == 1) {
-                        score += 100;
+                        score += 200;
                     }
                     else if ((gridReference[idxRef] ^ gridCurrent[idx])) {
                         score--; // score -= 3;
