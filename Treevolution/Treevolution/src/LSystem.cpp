@@ -45,8 +45,11 @@ void LSystem::reset()
     productions.clear();
 }
 
-const std::string& LSystem::getIteration(unsigned int n)
+const std::string& LSystem::getIteration(unsigned int n, int seed)
 {
+    iterations.clear();
+    current = axiom;
+    mGenerator.seed(seed);
     if (n >= iterations.size())
     {
         for (size_t i = iterations.size(); i <= n; i++)
@@ -85,7 +88,7 @@ void LSystem::loadProgramFromString(const std::string& program)
     while (index < program.size())
     {
         size_t nextIndex = program.find("\n", index);
-        std::string line = program.substr(index, nextIndex);
+        std::string line = program.substr(index, nextIndex-index);
         addProduction(line);
         if (nextIndex == std::string::npos) break;
         index = nextIndex + 1;
@@ -110,11 +113,20 @@ void LSystem::addProduction(std::string line)
     {
         std::string symFrom = line.substr(0, index);
         std::string symTo = line.substr(index + 2);
-        productions[symFrom] = symTo;
+        if (productions.count(symFrom) > 0)
+        {
+            productions[symFrom].push_back(symTo);
+        }
+        else
+        {
+            std::vector<std::string> str;
+            str.push_back(symTo);
+            productions[symFrom] = str;
+        }
     }
     else  // assume its the start sym
     {
-        current = line;
+        axiom = line;
     }
 }
 
@@ -124,7 +136,25 @@ std::string LSystem::iterate(const std::string& input)
     for (unsigned int i = 0; i < input.size(); i++)
     {
         std::string sym = input.substr(i, 1);
-        std::string next = productions.count(sym) > 0 ? productions[sym] : sym;
+        std::string next;
+        if (productions.count(sym) > 0)
+        {
+            if (productions[sym].size() > 1)
+            {
+                std::uniform_real_distribution<float> chooseDist(0.0f, (float)(productions[sym].size()));
+                int rand = (int)floor(chooseDist(mGenerator));
+
+                next = productions[sym][rand];
+            }
+            else
+            {
+                next = productions[sym][0];
+            }
+        }
+        else
+        {
+            next = sym;
+        }
         output = output + next;
     }
     return output;
@@ -200,7 +230,7 @@ void LSystem::process(unsigned int n,
     // Init so we're pointing up
     //turtle.applyLeftRot(-90);
 
-    std::string insn = getIteration(n);
+    std::string insn = getIteration(n, 0);
 
     std::vector<int> depth;
     int curDepth = 0;

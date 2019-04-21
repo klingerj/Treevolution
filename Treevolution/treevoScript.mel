@@ -1,0 +1,63 @@
+global proc treevoScript()
+{
+    window -title "Treevolution" treeWindow;
+    columnLayout;
+    
+    frameLayout -label "Genetic Algorithm Parameters" -collapsable false;
+    button -label "Branch Mesh" -command "browseMeshFiles";
+    intSliderGrp -label "Population Size" -field true -minValue 1 -maxValue 400 -value 200 popSlider;
+    intSliderGrp -label "# of Generations" -field true -minValue 1 -maxValue 100 -value 50 ngSlider;
+    intSliderGrp -label "# of Previews" -field true -minValue 1 -maxValue 20 -value 1 npSlider;
+
+    frameLayout -label "Fitness Evaluation" -collapsable true;
+
+    global string $collection;
+    $collection = `radioCollection`;
+    string $f1, $f2;
+    $f1 = `radioButton -label "3D Volumetric"`;
+    $f2 = `radioButton -label "2D Image Silhouette"`;
+    setParent ..;
+    radioCollection -edit -select $f1 $collection;
+
+    button -label "Target Volume" -command "browseTgtFiles";
+    
+    frameLayout -label " ";
+    button -label "Generate" -command "createTree";
+    button -label "Cancel" -command "deleteUI treeWindow";
+    
+    showWindow treeWindow;
+}
+
+global proc int browseMeshFiles() {
+   global string $inMesh;
+   string $dir[] = `fileDialog2 -fileFilter "*.obj" -fm 1`;
+   $inMesh = $dir[0];
+   return true;
+}
+
+global proc int browseTgtFiles() {
+   global string $tgtVol;
+   string $dir[] = `fileDialog2 -fileFilter "*.obj" -fm 1`;
+   $tgtVol = $dir[0];
+   return true;
+}
+
+global proc createTree()
+{   
+    global string $inMesh;
+    int $pop = `intSliderGrp -q -v popSlider`;
+    int $ng = `intSliderGrp -q -v ngSlider`;
+    int $np = `intSliderGrp -q -v npSlider`;
+    global string $collection;
+    string $fitness = `radioCollection -q -sl $collection`;
+    global string $tgtVol;
+    
+    createNode TreevolutionNode;
+    setAttr TreevolutionNode1.inMesh -type "string" $inMesh;
+    setAttr TreevolutionNode1.popSize $pop;
+    setAttr TreevolutionNode1.numGen $ng;
+    setAttr TreevolutionNode1.numPreview $np;
+    setAttr TreevolutionNode1.fitnessType -type "string" $fitness;
+    setAttr TreevolutionNode1.tgtVolume -type "string" $tgtVol;
+    getAttr TreevolutionNode1.outputMesh;
+}

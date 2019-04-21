@@ -101,8 +101,7 @@ int main() {
 	  LSystem sys;
 	  sys.setDefaultStep(0.1f);
 	  sys.setDefaultAngle(30.0f);
-	  sys.loadProgramFromString("F\nF->F[+F][-F]"); //taken from simple1.txt
-    std::string iteratedStr = sys.getIteration(2);
+	  sys.loadProgramFromString("F\nF->F[+F][-F]\nF->F\nF->F[+F]"); //taken from simple1.txt
 
     /*TreeStructure theTree = TreeStructure(1, iteratedStr, 0.0f, 90.0f, 1.0f, 3.0f);
     TreeStructure theTree2 = TreeStructure(2, iteratedStr, 0.0f, 90.0f, 1.0f, 3.0f);
@@ -114,7 +113,7 @@ int main() {
 
     // Load reference model
     Mesh referenceMesh = Mesh();
-    referenceMesh.LoadFromFile("res/models/complexBoi.obj");
+    referenceMesh.LoadFromFile("res/models/tallestBoi.obj");
 
     // Volumetric fitness evaluation
     FitnessEvalMethod* eval = new VolumetricFitnessEval(0.22f);
@@ -134,18 +133,20 @@ int main() {
 
     
 
-    const int elitism = 40; // must be even!!!!!!
+    const int elitism = 10; // must be even!!!!!!
     std::vector<TreeStructure> population;
-    constexpr int popSize = 200;
+    constexpr int popSize = 50;
     population.reserve(popSize * 2);
     for (int i = 0; i < popSize; ++i) {
-        population.emplace_back(std::move(TreeStructure(i, iteratedStr, 0.0f, 90.0f, 1.0f, 3.0f)));
+        std::string iteratedStr = sys.getIteration(3, i);
+        std::cout << iteratedStr << std::endl;
+        population.emplace_back(std::move(TreeStructure(i, iteratedStr, 0.0f, 90.0f, 0.25f, 3.0f)));
     }
 
     std::vector<TreeStructure> newPopulation;
     newPopulation.reserve(popSize * 2);
 
-    constexpr int numGenerations = 50;
+    constexpr int numGenerations = 25;
     for (int i = 0; i < numGenerations; ++i) {
         std::cout << "New Generation: " << i << std::endl;
         // Compute fitness scores

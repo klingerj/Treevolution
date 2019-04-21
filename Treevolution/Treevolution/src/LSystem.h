@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <random>
 #include <glm/glm.hpp>
 
 class LSystem {
@@ -23,10 +24,10 @@ public:
     float getDefaultAngle() const;
     float getDefaultStep() const;
     const std::string& getGrammarString() const;
-    std::map<std::string, std::string> getRules() const { return productions; }
+    std::map<std::string, std::vector<std::string>> getRules() const { return productions; }
 
     // Iterate grammar
-    const std::string& getIteration(unsigned int n);
+    const std::string& getIteration(unsigned int n, int seed);
 
     // Get geometry from running the turtle
     void process(unsigned int n,
@@ -37,13 +38,16 @@ protected:
     void addProduction(std::string line);
     std::string iterate(const std::string& input);
 
-    std::map<std::string, std::string> productions;
+    std::map<std::string, std::vector<std::string>> productions;
     std::vector<std::string> iterations;
     std::vector<Branch> bboxes;
     std::string current;
+    std::string axiom;
     float mDfltAngle;
     float mDfltStep;
     std::string mGrammar;
+
+    std::default_random_engine mGenerator;
 
     class Turtle
     {
