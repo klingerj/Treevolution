@@ -1,5 +1,7 @@
 #pragma once
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
 #include "glm/glm.hpp"
 
 #include <vector>
@@ -40,4 +42,23 @@ public:
     // Set the reference volumetric grid
     void SetGrid(const Mesh& mesh, uint8_t gridType);
     std::vector<glm::vec3> GetGridPoints(uint8_t gridType);
+};
+
+class ImageFitnessEval : public FitnessEvalMethod {
+private:
+    GLuint fbo;
+    GLuint* refImage;
+    GLuint* currImage;
+    int width, height;
+
+public:
+    ImageFitnessEval();
+    ~ImageFitnessEval();
+
+    // Returns the evaluated fitness score.
+    int Evaluate() const override;
+
+    // Set the reference image array
+    void SetRefImage(Mesh& mesh);
+    void SetCurrImage(Mesh& mesh);
 };

@@ -131,3 +131,32 @@ std::vector<glm::vec3> VolumetricFitnessEval::GetGridPoints(uint8_t gridType) {
     }
     return points;
 }
+
+// Image-based fitness
+
+ImageFitnessEval::ImageFitnessEval() : fbo(-1), refImage(nullptr), width(800), height(600) {
+    // TODO: setup FBO and stuff
+    // need to store the shader program in this class too
+}
+ImageFitnessEval::~ImageFitnessEval() {}
+
+void ImageFitnessEval::SetRefImage(Mesh& mesh) {
+    // TODO: do draw ops
+    // refImage = img;
+}
+
+void ImageFitnessEval::SetCurrImage(Mesh& mesh) {
+    // currImage = img;
+}
+
+int ImageFitnessEval::Evaluate() const {
+    int score = 0;
+    for (int i = 0; i < width * height * 4; i++) {
+        if (refImage[i] == currImage[i]) {
+            score++;
+        } else {
+            score--;
+        }
+    }
+    return score;
+}

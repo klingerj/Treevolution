@@ -21,7 +21,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-Camera camera = Camera(glm::vec3(0, 0, 8), glm::vec3(0, 0, 0), 0.7853981634f, 1.3333f, 0.01f, 100.0f);
+Camera camera = Camera(glm::vec3(0, 5, 16), glm::vec3(0, 0, 0), 0.7853981634f, 1.3333f, 0.01f, 100.0f);
 const float camMoveSensitivity = 0.02f;
 bool showGridPoints = true;
 
@@ -125,6 +125,7 @@ int main() {
     // Load reference model
     Mesh referenceMesh = Mesh();
     referenceMesh.LoadFromFile("res/models/tallestBoi.obj");
+    referenceMesh.Create();
 
     /* Image based fitness testing */
 
@@ -137,7 +138,7 @@ int main() {
     unsigned int texture;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, WIDTH, HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, WIDTH, HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -156,7 +157,22 @@ int main() {
     
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
         // something went wrong
+        exit(1);
     }
+
+    // Render the mesh
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+    flatShader.setCameraViewProj("cameraViewProj", camera.GetViewProj());
+    glm::mat4 model = glm::mat4(1.0f);
+    flatShader.SetModelMatrix("model", model);
+    flatShader.Draw(referenceMesh);
+
+    const int size = 600 * 800 * 4 * sizeof(GLuint);
+    GLuint* imgData = new GLuint[size];
+    glReadPixels(0, 0, 800, 600, GL_RGBA, GL_UNSIGNED_BYTE, imgData);
+    // int result = stbi_write_png("./test.png", 800, 600, 4, imgData, 800 * 4);
+
 
     // render the mesh to that framebuffer
     // make sure background is cleared to black
