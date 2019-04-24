@@ -14,11 +14,14 @@
 
 #include <iostream>
 
+#define WIDTH 800
+#define HEIGHT 600
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-Camera camera = Camera(glm::vec3(0, 0, 2), glm::vec3(0, 0, 0), 0.7853981634f, 1.3333f, 0.01f, 100.0f);
+Camera camera = Camera(glm::vec3(0, 0, 8), glm::vec3(0, 0, 0), 0.7853981634f, 1.3333f, 0.01f, 100.0f);
 const float camMoveSensitivity = 0.02f;
 bool showGridPoints = true;
 
@@ -75,7 +78,7 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(800, 600, "Treevolution", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Treevolution", NULL, NULL);
     if (window == NULL) {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -123,6 +126,53 @@ int main() {
     Mesh referenceMesh = Mesh();
     referenceMesh.LoadFromFile("res/models/tallestBoi.obj");
 
+    /* Image based fitness testing */
+
+    // setup framebuffer
+    unsigned int fbo;
+    glGenFramebuffers(1, &fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+    // create texture attachment
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, WIDTH, HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // Set texture to be color attachment
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
+
+    // RBO setup
+    unsigned int rbo;
+    glGenRenderbuffers(1, &rbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 800, 600);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+    // Use RBO as depth stencil attachment
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+    
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        // something went wrong
+    }
+
+    // render the mesh to that framebuffer
+    // make sure background is cleared to black
+    // all pixels written to should be white
+    // retrieve the image information with glReadPixels
+    // output the image for testing
+
+    // TODO: remember to set the framebuffer to the screen later on!!
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glDeleteFramebuffers(1, &fbo);
+
+
+
+
+
+
     // Volumetric fitness evaluation
     FitnessEvalMethod* eval = new VolumetricFitnessEval(0.4f);
     VolumetricFitnessEval* volumetricEval = dynamic_cast<VolumetricFitnessEval*>(eval);
@@ -152,7 +202,7 @@ int main() {
     std::vector<TreeStructure> newPopulation;
     newPopulation.reserve(popSize);
 
-    constexpr int numGenerations = 4;
+    constexpr int numGenerations = 0;
     for (int i = 0; i < numGenerations; ++i) {
         std::cout << "New Generation: " << i << std::endl;
         // Compute fitness scores
