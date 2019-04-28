@@ -97,19 +97,20 @@ int main() {
     Mesh branchMesh = Mesh();
     branchMesh.LoadFromFile("res/models/cube.obj");
 
+    Mesh leafMesh = Mesh();
+    leafMesh.LoadFromFile("res/models/sphere.obj");
+
 	  // Create L-system
 	  LSystem sys;
 	  sys.setDefaultStep(0.1f);
 	  sys.setDefaultAngle(30.0f);
-	  sys.loadProgramFromString("F\nF->F[+F][-F]\nF->F\nF->F[+F]"); //taken from simple1.txt
+	  sys.loadProgramFromString("F\nF->FX[+F]X[-F]X\nF->FX\nF->FX[+F]X"); //taken from simple1.txt
 
-    /*TreeStructure theTree = TreeStructure(1, iteratedStr, 0.0f, 90.0f, 1.0f, 3.0f);
-    TreeStructure theTree2 = TreeStructure(2, iteratedStr, 0.0f, 90.0f, 1.0f, 3.0f);
-    //theTree.Crossover(&theTree2);
-    Mesh treeMesh = theTree.GetTreeMesh(branchMesh);
-    Mesh treeMesh2 = theTree2.GetTreeMesh(branchMesh);
+    std::string iteratedStr = sys.getIteration(3, 435);
+    std::cout << iteratedStr << std::endl;
+    TreeStructure theTree = TreeStructure(1, iteratedStr, 0.0f, 90.0f, 1.0f, 3.0f);
+    Mesh treeMesh = theTree.GetTreeMesh(branchMesh, leafMesh);
     treeMesh.Create();
-    treeMesh2.Create();*/
 
     // Load reference model
     Mesh referenceMesh = Mesh();
@@ -137,7 +138,7 @@ int main() {
     std::vector<TreeStructure> population;
     constexpr int popSize = 50;
     population.reserve(popSize * 2);
-    for (int i = 0; i < popSize; ++i) {
+    /*for (int i = 0; i < popSize; ++i) {
         std::string iteratedStr = sys.getIteration(3, i);
         std::cout << iteratedStr << std::endl;
         population.emplace_back(std::move(TreeStructure(i, iteratedStr, 0.0f, 90.0f, 0.25f, 3.0f)));
@@ -152,7 +153,7 @@ int main() {
         // Compute fitness scores
         for (int j = 0; j < popSize; ++j) {
             //std::cout << "Handling pop member: " << j << std::endl;
-            Mesh treeMesh = population[j].GetTreeMesh(branchMesh); // Get the current pop member's mesh
+            Mesh treeMesh = population[j].GetTreeMesh(branchMesh, leafMesh); // Get the current pop member's mesh
             if (treeMesh.GetTriangles().size() == 0) {
                 population[j].fitnessScore = -9999999999;
                 continue;
@@ -192,9 +193,9 @@ int main() {
     std::vector<Mesh> treeMeshes;
     for (int i = 0; i < elitism; ++i) {
         std::cout << "Fitness: " << population[i].fitnessScore << std::endl;
-        treeMeshes.push_back(population[i].GetTreeMesh(branchMesh));
+        treeMeshes.push_back(population[i].GetTreeMesh(branchMesh, leafMesh));
         treeMeshes[i].Create();
-    }
+    }*/
 
     DrawablePoints gridPoints;
     std::vector<glm::vec3> points = volumetricEval->GetGridPoints(0);
@@ -219,12 +220,15 @@ int main() {
         flatShader.setCameraViewProj("cameraViewProj", camera.GetViewProj());
         glm::mat4 model = glm::mat4(1.0f);
         
-        for (int i = 0; i < elitism; ++i) {
+        model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, 0.0f));
+        flatShader.SetModelMatrix("model", model);
+        flatShader.Draw(treeMesh);
+        /*for (int i = 0; i < elitism; ++i) {
             model = glm::translate(glm::mat4(1.0f), glm::vec3(4.0f * i, 0.0, 0.0f));
             flatShader.SetModelMatrix("model", model);
             flatShader.Draw(treeMeshes[i]);
             flatShader.Draw(gridPoints);
-        }
+        }*/
 
         // Check/call events, swap buffers
         glfwPollEvents();
@@ -235,9 +239,10 @@ int main() {
     glDeleteVertexArrays(1, &VAO);
     //lines.destroy();
     //referenceMesh.destroy();
-    for (int i = 0; i < elitism; ++i) {
-        treeMeshes[i].destroy();
-    }
+    //for (int i = 0; i < elitism; ++i) {
+    //    treeMeshes[i].destroy();
+   // }
+    treeMesh.destroy();
     glfwTerminate();
 
     exit(EXIT_SUCCESS);

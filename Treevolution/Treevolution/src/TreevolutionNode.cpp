@@ -131,11 +131,14 @@ MObject TreevolutionNode::createMesh(MObject& outData, const MString& meshStr, c
     Mesh branchMesh = Mesh();
     branchMesh.LoadFromFile(meshStr.asChar());
 
+    Mesh leafMesh = Mesh();
+    leafMesh.LoadFromFile("res/models/sphere.obj");
+
     // Create L-system
     LSystem sys;
     sys.setDefaultStep(0.1f);
     sys.setDefaultAngle(30.0f);
-    sys.loadProgramFromString("F\nF->F[+F][-F]\nF->F\nF->F[+F]"); //taken from simple1.txt
+    sys.loadProgramFromString("F\nF->FX[+F]X[-F]X\nF->FX\nF->FX[+F]X"); //taken from simple1.txt
 
     // TO TEST MESH SHOWS UP
     //TreeStructure theTree = TreeStructure(1, iteratedStr, 0.0f, 90.0f, 1.0f, 3.0f);
@@ -172,7 +175,7 @@ MObject TreevolutionNode::createMesh(MObject& outData, const MString& meshStr, c
         // Compute fitness scores
         for (int j = 0; j < popSize; ++j) {
             //std::cout << "Handling pop member: " << j << std::endl;
-            Mesh treeMesh = population[j].GetTreeMesh(branchMesh); // Get the current pop member's mesh
+            Mesh treeMesh = population[j].GetTreeMesh(branchMesh, leafMesh); // Get the current pop member's mesh
             if (treeMesh.GetTriangles().size() == 0) {
                 population[j].fitnessScore = -9999999999;
                 continue;
@@ -213,7 +216,7 @@ MObject TreevolutionNode::createMesh(MObject& outData, const MString& meshStr, c
     std::vector<Mesh> treeMeshes;
     for (int i = 0; i < nPrev; ++i) {
         //std::cout << "Fitness: " << population[i].fitnessScore << std::endl;
-        treeMeshes.push_back(population[i].GetTreeMesh(branchMesh));
+        treeMeshes.push_back(population[i].GetTreeMesh(branchMesh, leafMesh));
     }
 
     // CREATING GEOMETRY

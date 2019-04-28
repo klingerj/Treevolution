@@ -76,7 +76,7 @@ void TreeStructure::ConstructTree(TreeNode *root, std::string substring)
     {
         char sym = substring.at(0);
 
-        if (sym == 'F' || sym == '-' || sym == '+')
+        if (sym == 'F' || sym == '-' || sym == '+' || sym == 'X')
         {
             TreeNode* next = AddChildToNode(root, sym);
             ConstructTree(next, substring.substr(1, substring.length() - 1));
@@ -118,6 +118,18 @@ TreeNode* TreeStructure::AddChildToNode(TreeNode* parent, char c)
         (*newNode) = TreeNode(c, p, a, parent);
     }
     else if (c == '+')
+    {
+        // generate three random numbers for axis and a random number for angle val
+        float x = mAxisDist(mGenerator);
+        float y = mAxisDist(mGenerator);
+        float z = mAxisDist(mGenerator);
+        glm::vec3 a(x, y, z);
+        a = glm::normalize(a);
+
+        float p = mAngleDist(mGenerator);
+        (*newNode) = TreeNode(c, p, a, parent);
+    }
+    else if (c == 'X')
     {
         // generate three random numbers for axis and a random number for angle val
         float x = mAxisDist(mGenerator);
@@ -286,6 +298,16 @@ void TreeStructure::Alter()
 
         gene->param = mAngleDist(mGenerator);
     }
+    else if (gene->name == 'X')
+    {
+        float x = mAxisDist(mGenerator);
+        float y = mAxisDist(mGenerator);
+        float z = mAxisDist(mGenerator);
+        glm::vec3 a(x, y, z);
+        gene->axis = glm::normalize(a);
+
+        gene->param = mAngleDist(mGenerator);
+    }
 }
 
 int TreeStructure::Mutate(const std::map<std::string, std::vector<std::string>> &rules)
@@ -309,7 +331,7 @@ int TreeStructure::Mutate(const std::map<std::string, std::vector<std::string>> 
     return action;
 }
 
-void TreeStructure::processNode(TreeNode* currNode, Mesh &baseMesh)
+void TreeStructure::processNode(TreeNode* currNode, Mesh &baseMesh, Mesh &leafMesh)
 {
     // perform the desired action for this node
     if (currNode->name == 'F')
@@ -350,6 +372,36 @@ void TreeStructure::processNode(TreeNode* currNode, Mesh &baseMesh)
             tris.push_back(newT);
         }
     }
+    else if (currNode->name == 'X')
+    {
+        // translation to current position
+        glm::vec3 pos = currTurtle.pos;
+        const glm::mat4 trans = glm::translate(glm::mat4(1.0), pos);
+        const glm::mat4 pivotTrans = glm::translate(glm::mat4(1.0), glm::vec3(0.0, -0.25, 0.0));
+
+        // find the rotation of the leaf geometry
+        const glm::mat4 rot = glm::rotate(glm::mat4(1.0), currNode->param, currNode->axis);
+
+        const glm::mat4 scale = glm::scale(glm::mat4(1.0), glm::vec3(0.1, 0.25, 0.1));
+
+        // create a transormation matrix
+        const glm::mat4 transform = trans*rot*pivotTrans*scale;
+
+        // add all the triangles of baseMesh modified by this matrix to tris
+        std::vector<Triangle> origTris = leafMesh.GetTriangles();
+        for (Triangle t : origTris)
+        {
+            std::vector<glm::vec3> oldPts = t.GetPoints();
+
+            Triangle newT;
+            newT.AppendVertex(transform * glm::vec4(oldPts[0], 1.0));
+            newT.AppendVertex(transform * glm::vec4(oldPts[1], 1.0));
+            newT.AppendVertex(transform * glm::vec4(oldPts[2], 1.0));
+            newT.ComputePlaneNormal();
+
+            tris.push_back(newT);
+        }
+    }
     else if (currNode->name == '-' || currNode->name == '+')
     {
         currTurtle.applyRot(currNode->axis, currNode->param);
@@ -361,7 +413,7 @@ void TreeStructure::processNode(TreeNode* currNode, Mesh &baseMesh)
         turtStack.push(currTurtle);
 
         // process child's subtree
-        processNode(child, baseMesh);
+        processNode(child, baseMesh, leafMesh);
 
         // end branch
         currTurtle = turtStack.top();
@@ -369,7 +421,7 @@ void TreeStructure::processNode(TreeNode* currNode, Mesh &baseMesh)
     }
 }
 
-Mesh TreeStructure::GetTreeMesh(Mesh &baseMesh)
+Mesh TreeStructure::GetTreeMesh(Mesh &baseMesh, Mesh &leafMesh)
 {
     tris.clear();
     
@@ -380,7 +432,7 @@ Mesh TreeStructure::GetTreeMesh(Mesh &baseMesh)
     
     Mesh output;
 
-    processNode(mRoot, baseMesh);
+    processNode(mRoot, baseMesh, leafMesh);
 
     // set tris to traingles of this mesh
     //if (tris.size() > 0) {

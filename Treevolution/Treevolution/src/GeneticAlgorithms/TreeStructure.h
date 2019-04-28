@@ -52,10 +52,10 @@ public:
 
     void CreateNodeList(TreeNode* root);
 
-    void processNode(TreeNode* currNode, Mesh &baseMesh);
+    void processNode(TreeNode * currNode, Mesh & baseMesh, Mesh & leafMesh);
 
     // Get geometry from running the turtle
-    Mesh GetTreeMesh(Mesh &branch);
+    Mesh GetTreeMesh(Mesh & baseMesh, Mesh & leafMesh);
 
     TreeNode* AddChildToNode(TreeNode* parent, char c);
 
