@@ -6,7 +6,6 @@
 #include <map>
 #include <random>
 #include <functional>
-#include <map>
 #include <glm/glm.hpp>
 
 #include "../Scene/Mesh.h"
@@ -53,19 +52,19 @@ public:
 
     void CreateNodeList(TreeNode* root);
 
-    void processNode(TreeNode* currNode, Mesh &baseMesh);
+    void processNode(TreeNode * currNode, Mesh & baseMesh, Mesh & leafMesh);
 
     // Get geometry from running the turtle
-    Mesh GetTreeMesh(Mesh &branch);
+    Mesh GetTreeMesh(Mesh & baseMesh, Mesh & leafMesh);
 
     TreeNode* AddChildToNode(TreeNode* parent, char c);
 
     // Genetic algoirthm functions
     void Crossover(TreeStructure* parent2);
-    void Grow(const std::map<std::string, std::string> &rules);
+    void Grow(const std::map<std::string, std::vector<std::string>> &rules);
     void Cut();
     void Alter();
-    int Mutate(const std::map<std::string, std::string> &rules);
+    int Mutate(const std::map<std::string, std::vector<std::string>> &rules);
 
     // TODO: Free all heap-allocated tree nodes
 

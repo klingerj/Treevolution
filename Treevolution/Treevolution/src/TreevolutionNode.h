@@ -21,9 +21,12 @@ class TreevolutionNode : public MPxNode
 public:
     static MTypeId id;
     static MObject meshString;
+    static MObject populationSize;
+    static MObject numGen;
     static MObject numPreview;
+    static MObject fitnessEvalType;
+    static MObject tgtVolString;
     static MObject outputMesh;
-    // TODO: GUI variables
 
     TreevolutionNode() {}
     virtual ~TreevolutionNode() {}
@@ -32,5 +35,6 @@ public:
     virtual MStatus compute(const MPlug& plug, MDataBlock& data);
 
 protected:
-    MObject createMesh(MObject& outData, const MString& meshStr, const int nPrev, MStatus& stat);
+    MObject createMesh(MObject& outData, const MString& meshStr, const int poplSize, const int nGen, const int nPrev, const MString& fitStr, 
+        const MString& tgtStr, MStatus& stat);
 };
