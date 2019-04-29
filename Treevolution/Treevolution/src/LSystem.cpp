@@ -161,7 +161,6 @@ std::string LSystem::iterate(const std::string& input)
     //for each sym in current state, replace the sym
 }
 
-
 LSystem::Turtle::Turtle() :
     pos(0, 0, 0),
     up(0, 0, 1, 1),

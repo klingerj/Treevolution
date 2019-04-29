@@ -217,6 +217,9 @@ void TreeStructure::Crossover(TreeStructure* parent2)
 }
 void TreeStructure::Grow(const std::map<std::string, std::vector<std::string>> &rules)
 {
+    if (nodeList.size() == 0) {
+        return;
+    }
     // get a random node
     std::uniform_real_distribution<float> chooseDist(0.0f, (float)(this->nodeList.size()));
     int rand = (int)floor(chooseDist(mGenerator));
