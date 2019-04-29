@@ -14,11 +14,14 @@
 
 #include <iostream>
 
+#define WIDTH 400
+#define HEIGHT 400
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-Camera camera = Camera(glm::vec3(0, 0, 2), glm::vec3(0, 0, 0), 0.7853981634f, 1.3333f, 0.01f, 100.0f);
+Camera camera = Camera(glm::vec3(0, 5, 16), glm::vec3(0, 0, 0), 0.7853981634f, 1.0f, 0.01f, 100.0f);
 const float camMoveSensitivity = 0.02f;
 bool showGridPoints = true;
 
@@ -75,7 +78,7 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(800, 600, "Treevolution", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Treevolution", NULL, NULL);
     if (window == NULL) {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -122,12 +125,18 @@ int main() {
     // Load reference model
     Mesh referenceMesh = Mesh();
     referenceMesh.LoadFromFile("res/models/tallestBoi.obj");
+    //referenceMesh.Create();
+
+    // int result = stbi_write_png("./test.png", 800, 600, 4, imgData, 800 * 4);
+
 
     // Volumetric fitness evaluation
-    FitnessEvalMethod* eval = new VolumetricFitnessEval(0.4f);
-    VolumetricFitnessEval* volumetricEval = dynamic_cast<VolumetricFitnessEval*>(eval);
-    volumetricEval->SetGrid(referenceMesh, 0);
-
+    //FitnessEvalMethod* eval = new VolumetricFitnessEval(0.4f);
+    FitnessEvalMethod* eval = new ImageFitnessEval();
+    //VolumetricFitnessEval* volumetricEval = dynamic_cast<VolumetricFitnessEval*>(eval);
+    ImageFitnessEval* imageEval = dynamic_cast<ImageFitnessEval*>(eval);
+    //volumetricEval->SetGrid(referenceMesh, 0);
+    imageEval->SetRefImage("res/images/input/YTreeSmallRandom2.png");
 
     //volumetricEval->SetGrid(treeMesh, 1);
     // TODO: better way to do this other than dynamic casting?
@@ -139,7 +148,6 @@ int main() {
     }
     gridPoints.Create();*/
 
-    
     const int elitism = 10; // must be even!!!!!!
     std::vector<TreeStructure> population;
     constexpr int popSize = 50;
@@ -152,7 +160,6 @@ int main() {
 
     std::vector<TreeStructure> newPopulation;
     newPopulation.reserve(popSize);
-
 
     constexpr int numGenerations = 25;
 
@@ -167,9 +174,10 @@ int main() {
                 continue;
             }
             else {
-                volumetricEval->SetGrid(treeMesh, 1); // set the grid points
-                population[j].fitnessScore = volumetricEval->Evaluate(); // get the evaluated score
-                // TODO: simplify the above to a single function call
+                imageEval->SetCurrImage(treeMesh, camera.GetViewProj(), glm::mat4(1.0f));
+                // volumetricEval->SetGrid(treeMesh, 1); // set the grid points
+                // population[j].fitnessScore = volumetricEval->Evaluate(); // get the evaluated score
+                population[j].fitnessScore = imageEval->Evaluate(); // get the evaluated score
             }
         }
         
@@ -179,7 +187,7 @@ int main() {
         newPopulation.clear();
 
         // Elitism
-        /*for (int e = 0; e < elitism; ++e) {
+        for (int e = 0; e < elitism; ++e) {
             newPopulation.push_back(population[e]);
             population.erase(population.begin() + e);
         }
@@ -201,9 +209,9 @@ int main() {
             }
             newPopulation.push_back(par1);
             newPopulation.push_back(par2);
-        }*/
+        }
 
-        for (int e = 0; e < elitism; ++e) {
+        /*for (int e = 0; e < elitism; ++e) {
             newPopulation.push_back(population[e]);
         }
 
@@ -218,7 +226,7 @@ int main() {
             }
             newPopulation.push_back(par1);
             newPopulation.push_back(par2);
-        }
+        }*/
         population = newPopulation;
     }
 
@@ -229,14 +237,14 @@ int main() {
         treeMeshes[i].Create();
     }
 
-    DrawablePoints gridPoints;
+    /*DrawablePoints gridPoints;
     std::vector<glm::vec3> points = volumetricEval->GetGridPoints(0);
     for (auto p : points) {
         gridPoints.addPoint(p);
     }
     std::cout << "num points: " << points.size() << std::endl;
     gridPoints.Create();
-    glPointSize(3);
+    glPointSize(3);*/
 
     while (!glfwWindowShouldClose(window)) {
         // Input handling
@@ -256,9 +264,9 @@ int main() {
             model = glm::translate(glm::mat4(1.0f), glm::vec3(15.0f * i, 0.0, 0.0f));
             flatShader.SetModelMatrix("model", model);
             flatShader.Draw(treeMeshes[i]);
-            if (showGridPoints) {
+            /*if (showGridPoints) {
                 flatShader.Draw(gridPoints);
-            }
+            }*/
         }
 
         // Check/call events, swap buffers
@@ -273,7 +281,7 @@ int main() {
     for (int i = 0; i < elitism; ++i) {
         treeMeshes[i].destroy();
     }
-    gridPoints.destroy();
+    // gridPoints.destroy();
     glfwTerminate();
 
     exit(EXIT_SUCCESS);

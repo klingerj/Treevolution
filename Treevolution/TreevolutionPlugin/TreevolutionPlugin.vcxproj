@@ -97,7 +97,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\Libraries\glm;$(MAYA_INSTALL_DIR)\include;$(SolutionDir)\..\Libraries\tinyobjloader;$(SolutionDir)\..\Libraries\glfw-3.2.1\include;$(SolutionDir)\..\Libraries\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\Libraries\glm;$(MAYA_INSTALL_DIR)\include;$(SolutionDir)\..\Libraries\tinyobjloader;$(SolutionDir)\..\Libraries\glfw-3.2.1\include;$(SolutionDir)\..\Libraries\glad\include;$(SolutionDir)\..\Libraries\stb;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NT_PLUGIN;REQUIRE_IOSTREAM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -113,7 +113,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\Libraries\glm;$(MAYA_INSTALL_DIR)\include;$(SolutionDir)\..\Libraries\tinyobjloader;$(SolutionDir)\..\Libraries\glfw-3.2.1\include;$(SolutionDir)\..\Libraries\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\Libraries\glm;$(MAYA_INSTALL_DIR)\include;$(SolutionDir)\..\Libraries\tinyobjloader;$(SolutionDir)\..\Libraries\glfw-3.2.1\include;$(SolutionDir)\..\Libraries\glad\include;$(SolutionDir)\..\Libraries\stb;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NT_PLUGIN;REQUIRE_IOSTREAM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -130,7 +130,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\Libraries\glm;$(MAYA_INSTALL_DIR)\include;$(SolutionDir)\..\Libraries\tinyobjloader;$(SolutionDir)\..\Libraries\glfw-3.2.1\include;$(SolutionDir)\..\Libraries\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\Libraries\glm;$(MAYA_INSTALL_DIR)\include;$(SolutionDir)\..\Libraries\tinyobjloader;$(SolutionDir)\..\Libraries\glfw-3.2.1\include;$(SolutionDir)\..\Libraries\glad\include;$(SolutionDir)\..\Libraries\stb;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NT_PLUGIN;REQUIRE_IOSTREAM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -149,7 +149,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\Libraries\glm;$(MAYA_INSTALL_DIR)\include;$(SolutionDir)\..\Libraries\tinyobjloader;$(SolutionDir)\..\Libraries\glfw-3.2.1\include;$(SolutionDir)\..\Libraries\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\Libraries\glm;$(MAYA_INSTALL_DIR)\include;$(SolutionDir)\..\Libraries\tinyobjloader;$(SolutionDir)\..\Libraries\glfw-3.2.1\include;$(SolutionDir)\..\Libraries\glad\include;$(SolutionDir)\..\Libraries\stb;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NT_PLUGIN;REQUIRE_IOSTREAM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -166,6 +166,7 @@
     <ClInclude Include="..\Treevolution\src\Globals.h" />
     <ClInclude Include="..\Treevolution\src\LSystem.h" />
     <ClInclude Include="..\Treevolution\src\OpenGL\Drawable.h" />
+    <ClInclude Include="..\Treevolution\src\OpenGL\ShaderProgram.h" />
     <ClInclude Include="..\Treevolution\src\Scene\Camera.h" />
     <ClInclude Include="..\Treevolution\src\Scene\Mesh.h" />
     <ClInclude Include="..\Treevolution\src\Scene\Raytracing\Raytracing.h" />
@@ -177,6 +178,7 @@
     <ClCompile Include="..\Treevolution\src\GeneticAlgorithms\TreeStructure.cpp" />
     <ClCompile Include="..\Treevolution\src\LSystem.cpp" />
     <ClCompile Include="..\Treevolution\src\OpenGL\Drawable.cpp" />
+    <ClCompile Include="..\Treevolution\src\OpenGL\ShaderProgram.cpp" />
     <ClCompile Include="..\Treevolution\src\PluginMain.cpp" />
     <ClCompile Include="..\Treevolution\src\Scene\Camera.cpp" />
     <ClCompile Include="..\Treevolution\src\Scene\Mesh.cpp" />

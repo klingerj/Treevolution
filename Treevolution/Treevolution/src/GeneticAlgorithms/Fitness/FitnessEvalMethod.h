@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "../../Scene/Mesh.h"
+#include "../../OpenGL/ShaderProgram.h"
 
 class FitnessEvalMethod {
 public:
@@ -40,4 +41,28 @@ public:
     // Set the reference volumetric grid
     void SetGrid(const Mesh& mesh, uint8_t gridType);
     std::vector<glm::vec3> GetGridPoints(uint8_t gridType);
+};
+
+class ImageFitnessEval : public FitnessEvalMethod {
+private:
+    GLuint fbo; // the framebuffer that we render to
+    GLuint rbo;
+    GLubyte* refImage; // reference render image
+    GLubyte* currImage; // current rendered image
+
+    long ctr = 0;
+
+public:
+    ImageFitnessEval();
+    ~ImageFitnessEval();
+
+    int width, height;
+    ShaderProgram sp;
+
+    // Returns the evaluated fitness score.
+    int Evaluate() const override;
+
+    // Set the reference image array
+    void SetRefImage(const std::string& path);
+    void SetCurrImage(Mesh& mesh, const glm::mat4& viewProj, const glm::mat4& model);
 };
