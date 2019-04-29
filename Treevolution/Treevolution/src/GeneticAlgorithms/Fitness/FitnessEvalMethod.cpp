@@ -1,5 +1,10 @@
 #include "FitnessEvalMethod.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
+
 FitnessEvalMethod::FitnessEvalMethod() {}
 FitnessEvalMethod::~FitnessEvalMethod() {}
 
@@ -13,13 +18,9 @@ VolumetricFitnessEval::~VolumetricFitnessEval() {
         delete gridCurrent;
     }
 }
-#include <iostream>
+
 int VolumetricFitnessEval::Evaluate() const {
     int score = 0;
-    /*for (int i = 0; i < (int)std::ceil(gridDimCurrent.x * gridDimCurrent.y * gridDimCurrent.z); ++i) {
-        score += 200 * (int)(gridReference[i] & gridCurrent[i] && gridReference[i]);
-        score -= (int)(gridReference[i] ^ gridCurrent[i]);
-    }*/
 
     for (int i = 0; i < gridDimCurrent.x; ++i)
     {
@@ -34,7 +35,6 @@ int VolumetricFitnessEval::Evaluate() const {
                 if (center.x < gridMin.x || center.y < gridMin.y || center.z < gridMin.z ||
                     center.x > gridMaxRef.x || center.y > gridMaxRef.y || center.z > gridMaxRef.z) {
                     score -= 2;
-                    std::cout << "here" << std::endl;
                 } else {
                     glm::vec3 index = glm::round((center - gridMin) / gridCellSize);
                     int idxRef = (int)(index.z + index.y * gridDim.z + index.x * gridDim.z * gridDim.y);
@@ -42,7 +42,7 @@ int VolumetricFitnessEval::Evaluate() const {
                         score += 200;
                     }
                     else if ((gridReference[idxRef] ^ gridCurrent[idx])) {
-                        score--; // score -= 3;
+                        score--;
                     }
                 }
 
@@ -134,27 +134,103 @@ std::vector<glm::vec3> VolumetricFitnessEval::GetGridPoints(uint8_t gridType) {
 
 // Image-based fitness
 
-ImageFitnessEval::ImageFitnessEval() : fbo(-1), refImage(nullptr), width(800), height(600) {
-    // TODO: setup FBO and stuff
-    // need to store the shader program in this class too
-}
-ImageFitnessEval::~ImageFitnessEval() {}
+ImageFitnessEval::ImageFitnessEval() : fbo(-1), rbo(-1), refImage(nullptr), currImage(nullptr),
+                                       width(400), height(400), sp("src/Shaders/flat.vert", "src/Shaders/flat.frag") {
+    // setup framebuffer
+    glGenFramebuffers(1, &fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
-void ImageFitnessEval::SetRefImage(Mesh& mesh) {
-    // TODO: do draw ops
-    // refImage = img;
+    // create texture attachment
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // Set texture to be color attachment
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
+
+    // RBO setup
+    glGenRenderbuffers(1, &rbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+    // Use RBO as depth stencil attachment
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        // something went wrong
+        std::cout << "GL Framebuffer not complete" << std::endl;
+    }
+}
+ImageFitnessEval::~ImageFitnessEval() {
+    glDeleteFramebuffers(1, &fbo);
+    delete refImage;
+    delete currImage;
 }
 
-void ImageFitnessEval::SetCurrImage(Mesh& mesh) {
-    // currImage = img;
+void ImageFitnessEval::SetRefImage(const std::string& path) {
+    if (!refImage) {
+        const int size = width * height * 4 * sizeof(GLubyte);
+        refImage = new GLubyte[size];
+    }
+    
+    int n = 4;
+    unsigned char *data = stbi_load(path.c_str(), &width, &height, &n, 0);
+    if (!data) {
+        std::cout << "couldn't load image" << std::endl;
+    }
+
+    // copy data to refImage
+    for (int i = 0; i < width * height * 4; i++) {
+        refImage[i] = (GLuint)data[i];
+    }
+    // test that this worked
+    //int result = stbi_write_png("./res/images/output/test.png", width, height, 4, refImage, width * 4);
+
+    stbi_image_free(data);
+}
+
+void ImageFitnessEval::SetCurrImage(Mesh& mesh, const glm::mat4& viewProj, const glm::mat4& model) {
+    mesh.Create();
+
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glClearDepth(1.0f);
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    if (!currImage) {
+        const int size = width * height * 4 * sizeof(GLubyte);
+        currImage = new GLubyte[size];
+    }
+
+    // Draw ops
+    sp.setCameraViewProj("cameraViewProj", viewProj);
+    sp.SetModelMatrix("model", model);
+    sp.Draw(mesh);
+
+    // Read the framebuffer data into the image
+    glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, currImage);
+    /*char buf[25];
+    memset(buf, '\0', 25);
+    sprintf_s(buf, "%ld", ctr++);
+    int result = stbi_write_png((std::string("./res/images/output/YTree_curr") + buf + std::string(".png")).c_str(), width, height, 4, currImage, width * 4);
+    */
+
+    mesh.destroy();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 int ImageFitnessEval::Evaluate() const {
     int score = 0;
-    for (int i = 0; i < width * height * 4; i++) {
+    for (int i = 0; i < width * height * 4; i += 4) {
         if (refImage[i] == currImage[i]) {
             score++;
-        } else {
+        }
+        else {
             score--;
         }
     }

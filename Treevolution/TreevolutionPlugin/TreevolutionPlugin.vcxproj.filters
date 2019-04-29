@@ -72,6 +72,9 @@
     <ClInclude Include="..\Treevolution\src\TreevolutionNode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\Treevolution\src\OpenGL\ShaderProgram.h">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Libraries\glad\src\glad.c">
@@ -103,6 +106,9 @@
     </ClCompile>
     <ClCompile Include="..\Treevolution\src\LSystem.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Treevolution\src\OpenGL\ShaderProgram.cpp">
+      <Filter>Source Files\OpenGL</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

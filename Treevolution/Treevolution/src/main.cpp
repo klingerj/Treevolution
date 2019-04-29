@@ -14,14 +14,14 @@
 
 #include <iostream>
 
-#define WIDTH 800
-#define HEIGHT 600
+#define WIDTH 400
+#define HEIGHT 400
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-Camera camera = Camera(glm::vec3(0, 5, 16), glm::vec3(0, 0, 0), 0.7853981634f, 1.3333f, 0.01f, 100.0f);
+Camera camera = Camera(glm::vec3(0, 5, 16), glm::vec3(0, 0, 0), 0.7853981634f, 1.0f, 0.01f, 100.0f);
 const float camMoveSensitivity = 0.02f;
 bool showGridPoints = true;
 
@@ -112,7 +112,7 @@ int main() {
 	  sys.setDefaultStep(0.1f);
 	  sys.setDefaultAngle(30.0f);
 	  sys.loadProgramFromString("F\nF->F[+F][-F]"); //taken from simple1.txt
-    std::string iteratedStr = sys.getIteration(3);
+    std::string iteratedStr = sys.getIteration(2);
 
     /*TreeStructure theTree = TreeStructure(1, iteratedStr, 0.0f, 90.0f, 1.0f, 3.0f);
     TreeStructure theTree2 = TreeStructure(2, iteratedStr, 0.0f, 90.0f, 1.0f, 3.0f);
@@ -125,75 +125,18 @@ int main() {
     // Load reference model
     Mesh referenceMesh = Mesh();
     referenceMesh.LoadFromFile("res/models/tallestBoi.obj");
-    referenceMesh.Create();
+    //referenceMesh.Create();
 
-    /* Image based fitness testing */
-
-    // setup framebuffer
-    unsigned int fbo;
-    glGenFramebuffers(1, &fbo);
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-
-    // create texture attachment
-    unsigned int texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, WIDTH, HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    // Set texture to be color attachment
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
-
-    // RBO setup
-    unsigned int rbo;
-    glGenRenderbuffers(1, &rbo);
-    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 800, 600);
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
-    // Use RBO as depth stencil attachment
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
-    
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        // something went wrong
-        exit(1);
-    }
-
-    // Render the mesh
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-    flatShader.setCameraViewProj("cameraViewProj", camera.GetViewProj());
-    glm::mat4 model = glm::mat4(1.0f);
-    flatShader.SetModelMatrix("model", model);
-    flatShader.Draw(referenceMesh);
-
-    const int size = 600 * 800 * 4 * sizeof(GLuint);
-    GLuint* imgData = new GLuint[size];
-    glReadPixels(0, 0, 800, 600, GL_RGBA, GL_UNSIGNED_BYTE, imgData);
     // int result = stbi_write_png("./test.png", 800, 600, 4, imgData, 800 * 4);
 
 
-    // render the mesh to that framebuffer
-    // make sure background is cleared to black
-    // all pixels written to should be white
-    // retrieve the image information with glReadPixels
-    // output the image for testing
-
-    // TODO: remember to set the framebuffer to the screen later on!!
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glDeleteFramebuffers(1, &fbo);
-
-
-
-
-
-
     // Volumetric fitness evaluation
-    FitnessEvalMethod* eval = new VolumetricFitnessEval(0.4f);
-    VolumetricFitnessEval* volumetricEval = dynamic_cast<VolumetricFitnessEval*>(eval);
-    volumetricEval->SetGrid(referenceMesh, 0);
-
+    //FitnessEvalMethod* eval = new VolumetricFitnessEval(0.4f);
+    FitnessEvalMethod* eval = new ImageFitnessEval();
+    //VolumetricFitnessEval* volumetricEval = dynamic_cast<VolumetricFitnessEval*>(eval);
+    ImageFitnessEval* imageEval = dynamic_cast<ImageFitnessEval*>(eval);
+    //volumetricEval->SetGrid(referenceMesh, 0);
+    imageEval->SetRefImage("res/images/input/YTreeSmallRandom2.png");
 
     //volumetricEval->SetGrid(treeMesh, 1);
     // TODO: better way to do this other than dynamic casting?
@@ -207,18 +150,18 @@ int main() {
 
     
 
-    const int elitism = 12; // must be even!!!!!!
+    const int elitism = 20; // must be even!!!!!!
     std::vector<TreeStructure> population;
-    constexpr int popSize = 60;
+    constexpr int popSize = 800;
     population.reserve(popSize);
     for (int i = 0; i < popSize; ++i) {
-        population.emplace_back(std::move(TreeStructure(i, iteratedStr, 0.0f, 120.0f, 1.0f, 3.0f)));
+        population.emplace_back(std::move(TreeStructure(i, iteratedStr, 0.0f, 100.0f, 0.5f, 3.0f)));
     }
 
     std::vector<TreeStructure> newPopulation;
     newPopulation.reserve(popSize);
 
-    constexpr int numGenerations = 0;
+    constexpr int numGenerations = 800;
     for (int i = 0; i < numGenerations; ++i) {
         std::cout << "New Generation: " << i << std::endl;
         // Compute fitness scores
@@ -230,9 +173,10 @@ int main() {
                 continue;
             }
             else {
-                volumetricEval->SetGrid(treeMesh, 1); // set the grid points
-                population[j].fitnessScore = volumetricEval->Evaluate(); // get the evaluated score
-                // TODO: simplify the above to a single function call
+                imageEval->SetCurrImage(treeMesh, camera.GetViewProj(), glm::mat4(1.0f));
+                // volumetricEval->SetGrid(treeMesh, 1); // set the grid points
+                // population[j].fitnessScore = volumetricEval->Evaluate(); // get the evaluated score
+                population[j].fitnessScore = imageEval->Evaluate(); // get the evaluated score
             }
         }
         
@@ -242,7 +186,7 @@ int main() {
         newPopulation.clear();
 
         // Elitism
-        /*for (int e = 0; e < elitism; ++e) {
+        for (int e = 0; e < elitism; ++e) {
             newPopulation.push_back(population[e]);
             population.erase(population.begin() + e);
         }
@@ -264,9 +208,9 @@ int main() {
             }
             newPopulation.push_back(par1);
             newPopulation.push_back(par2);
-        }*/
+        }
 
-        for (int e = 0; e < elitism; ++e) {
+        /*for (int e = 0; e < elitism; ++e) {
             newPopulation.push_back(population[e]);
         }
 
@@ -281,7 +225,7 @@ int main() {
             }
             newPopulation.push_back(par1);
             newPopulation.push_back(par2);
-        }
+        }*/
         population = newPopulation;
     }
 
@@ -292,14 +236,14 @@ int main() {
         treeMeshes[i].Create();
     }
 
-    DrawablePoints gridPoints;
+    /*DrawablePoints gridPoints;
     std::vector<glm::vec3> points = volumetricEval->GetGridPoints(0);
     for (auto p : points) {
         gridPoints.addPoint(p);
     }
     std::cout << "num points: " << points.size() << std::endl;
     gridPoints.Create();
-    glPointSize(3);
+    glPointSize(3);*/
 
     while (!glfwWindowShouldClose(window)) {
         // Input handling
@@ -319,9 +263,9 @@ int main() {
             model = glm::translate(glm::mat4(1.0f), glm::vec3(15.0f * i, 0.0, 0.0f));
             flatShader.SetModelMatrix("model", model);
             flatShader.Draw(treeMeshes[i]);
-            if (showGridPoints) {
+            /*if (showGridPoints) {
                 flatShader.Draw(gridPoints);
-            }
+            }*/
         }
 
         // Check/call events, swap buffers
@@ -336,7 +280,7 @@ int main() {
     for (int i = 0; i < elitism; ++i) {
         treeMeshes[i].destroy();
     }
-    gridPoints.destroy();
+    // gridPoints.destroy();
     glfwTerminate();
 
     exit(EXIT_SUCCESS);

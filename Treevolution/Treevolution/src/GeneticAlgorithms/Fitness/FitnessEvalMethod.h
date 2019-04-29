@@ -1,12 +1,11 @@
 #pragma once
 
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb_image_write.h"
 #include "glm/glm.hpp"
 
 #include <vector>
 
 #include "../../Scene/Mesh.h"
+#include "../../OpenGL/ShaderProgram.h"
 
 class FitnessEvalMethod {
 public:
@@ -46,19 +45,24 @@ public:
 
 class ImageFitnessEval : public FitnessEvalMethod {
 private:
-    GLuint fbo;
-    GLuint* refImage;
-    GLuint* currImage;
-    int width, height;
+    GLuint fbo; // the framebuffer that we render to
+    GLuint rbo;
+    GLubyte* refImage; // reference render image
+    GLubyte* currImage; // current rendered image
+
+    long ctr = 0;
 
 public:
     ImageFitnessEval();
     ~ImageFitnessEval();
 
+    int width, height;
+    ShaderProgram sp;
+
     // Returns the evaluated fitness score.
     int Evaluate() const override;
 
     // Set the reference image array
-    void SetRefImage(Mesh& mesh);
-    void SetCurrImage(Mesh& mesh);
+    void SetRefImage(const std::string& path);
+    void SetCurrImage(Mesh& mesh, const glm::mat4& viewProj, const glm::mat4& model);
 };
