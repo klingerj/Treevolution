@@ -5,3 +5,9 @@ x64/
 *.opendb
 Treevolution/Treevolution.VC.db
 Treevolution.VC.db
+*.iobj
+*.ipdb
+*.mll
+*.pdb
+*.exp
+*.lib
