@@ -28,6 +28,12 @@ TreeNode::TreeNode(char c, float f, glm::vec3 &a, TreeNode* parent) :
 
 }
 
+TreeNode::TreeNode(char c, float f, float f2, glm::vec3 &a, TreeNode* parent) :
+    name(c), param(f), param2(f2), axis(a), parent(parent)
+{
+
+}
+
 TreeNode::~TreeNode()
 {
     for (TreeNode* c : this->children)
@@ -139,7 +145,8 @@ TreeNode* TreeStructure::AddChildToNode(TreeNode* parent, char c)
         a = glm::normalize(a);
 
         float p = mAngleDist(mGenerator);
-        (*newNode) = TreeNode(c, p, a, parent);
+        float p2 = mLenDist(mGenerator);
+        (*newNode) = TreeNode(c, p, p2, a, parent);
     }
 
     parent->children.push_back(newNode);
@@ -310,6 +317,7 @@ void TreeStructure::Alter()
         gene->axis = glm::normalize(a);
 
         gene->param = mAngleDist(mGenerator);
+        gene->param2 = mLenDist(mGenerator);
     }
 }
 
@@ -385,7 +393,7 @@ void TreeStructure::processNode(TreeNode* currNode, Mesh &baseMesh, Mesh &leafMe
         // find the rotation of the leaf geometry
         const glm::mat4 rot = glm::rotate(glm::mat4(1.0), currNode->param, currNode->axis);
 
-        const glm::mat4 scale = glm::scale(glm::mat4(1.0), glm::vec3(0.1, 0.25, 0.1));
+        const glm::mat4 scale = glm::scale(glm::mat4(1.0), glm::vec3(0.1*currNode->param2, 0.25*currNode->param2, 0.1*currNode->param2));
 
         // create a transormation matrix
         const glm::mat4 transform = trans*rot*pivotTrans*scale;

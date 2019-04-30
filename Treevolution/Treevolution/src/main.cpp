@@ -114,7 +114,7 @@ int main() {
 	  LSystem sys;
 	  sys.setDefaultStep(0.1f);
 	  sys.setDefaultAngle(30.0f);
-	  sys.loadProgramFromString("F\nF->FX[+F]X[-F]X\nF->FX\nF->FX[+F]X"); //taken from simple1.txt
+	  sys.loadProgramFromString("F\nF->FXXXX[X+FXX]XXXX[X-FXXX]XXXXX\nF->FXXX\nF->FXX[XX+FXXX]XXXXX"); //taken from simple1.txt
 
     /*std::string iteratedStr = sys.getIteration(3, 435);
     std::cout << iteratedStr << std::endl;

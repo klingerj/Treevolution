@@ -2,12 +2,14 @@
 
 #include "LSystem.h"
 #include "Scene/Mesh.h"
+#include "Scene/Camera.h"
 #include "GeneticAlgorithms/TreeStructure.h"
 #include "GeneticAlgorithms/Fitness/FitnessEvalMethod.h"
 #include <glm/gtc/matrix_transform.hpp>
 
 MTypeId TreevolutionNode::id(0x80000);
 MObject TreevolutionNode::meshString;
+MObject TreevolutionNode::meshLeafString;
 MObject TreevolutionNode::populationSize;
 MObject TreevolutionNode::numGen;
 MObject TreevolutionNode::numPreview;
@@ -24,6 +26,7 @@ MStatus TreevolutionNode::initialize()
 {
     // attributes for each GUI var
     MFnTypedAttribute inMeshAttr;
+    MFnTypedAttribute inLeafMeshAttr;
     MFnNumericAttribute popSizeAttr;
     MFnNumericAttribute nGenAttr;
     MFnNumericAttribute nPrevAttr;
@@ -35,6 +38,10 @@ MStatus TreevolutionNode::initialize()
 
     // create attributes
     TreevolutionNode::meshString = inMeshAttr.create("inMesh", "in",
+        MFnData::kString,
+        &returnStatus);
+
+    TreevolutionNode::meshLeafString = inLeafMeshAttr.create("inLeafMesh", "il",
         MFnData::kString,
         &returnStatus);
 
@@ -64,6 +71,7 @@ MStatus TreevolutionNode::initialize()
 
     // add attributes
     returnStatus = addAttribute(TreevolutionNode::meshString);
+    returnStatus = addAttribute(TreevolutionNode::meshLeafString);
     returnStatus = addAttribute(TreevolutionNode::populationSize);
     returnStatus = addAttribute(TreevolutionNode::numGen);
     returnStatus = addAttribute(TreevolutionNode::numPreview);
@@ -73,6 +81,8 @@ MStatus TreevolutionNode::initialize()
 
     // attribute affects
     returnStatus = attributeAffects(TreevolutionNode::meshString,
+        TreevolutionNode::outputMesh);
+    returnStatus = attributeAffects(TreevolutionNode::meshLeafString,
         TreevolutionNode::outputMesh);
     returnStatus = attributeAffects(TreevolutionNode::populationSize,
         TreevolutionNode::outputMesh);
@@ -97,6 +107,8 @@ MStatus TreevolutionNode::compute(const MPlug& plug, MDataBlock& data)
 
         MDataHandle inMeshData = data.inputValue(meshString, &returnStatus);
         MString meshStr = inMeshData.asString();
+        MDataHandle inLeafMeshData = data.inputValue(meshLeafString, &returnStatus);
+        MString leafStr = inLeafMeshData.asString();
         MDataHandle popData = data.inputValue(populationSize, &returnStatus);
         MDataHandle ngData = data.inputValue(numGen, &returnStatus);
         MDataHandle npData = data.inputValue(numPreview, &returnStatus);
@@ -109,7 +121,7 @@ MStatus TreevolutionNode::compute(const MPlug& plug, MDataBlock& data)
         MFnMeshData dataCreator;
         MObject newOutputData = dataCreator.create(&returnStatus);
 
-        createMesh(newOutputData, meshStr, popData.asInt(), ngData.asInt(), npData.asInt(), fitnessStr, tgtVolStr, returnStatus);
+        createMesh(newOutputData, meshStr, leafStr, popData.asInt(), ngData.asInt(), npData.asInt(), fitnessStr, tgtVolStr, returnStatus);
 
         outputHandle.set(newOutputData);
         data.setClean(plug);
@@ -120,7 +132,7 @@ MStatus TreevolutionNode::compute(const MPlug& plug, MDataBlock& data)
     return MS::kSuccess;
 }
 
-MObject TreevolutionNode::createMesh(MObject& outData, const MString& meshStr, const int poplSize, const int nGen, const int nPrev, const MString& fitStr, 
+MObject TreevolutionNode::createMesh(MObject& outData, const MString& meshStr, const MString& leafStr, const int poplSize, const int nGen, const int nPrev, const MString& fitStr,
     const MString& tgtStr, MStatus& stat)
 {
     // DO MAIN
@@ -132,7 +144,7 @@ MObject TreevolutionNode::createMesh(MObject& outData, const MString& meshStr, c
     branchMesh.LoadFromFile(meshStr.asChar());
 
     Mesh leafMesh = Mesh();
-    leafMesh.LoadFromFile("res/models/sphere.obj");
+    leafMesh.LoadFromFile(leafStr.asChar());
 
     // Create L-system
     LSystem sys;
@@ -144,79 +156,153 @@ MObject TreevolutionNode::createMesh(MObject& outData, const MString& meshStr, c
     //TreeStructure theTree = TreeStructure(1, iteratedStr, 0.0f, 90.0f, 1.0f, 3.0f);
     //Mesh treeMesh = theTree.GetTreeMesh(branchMesh);
 
-    // Load reference model
-    Mesh referenceMesh = Mesh();
-    referenceMesh.LoadFromFile(tgtStr.asChar());
-
-    // Volumetric fitness evaluation
-    FitnessEvalMethod* eval = new VolumetricFitnessEval(0.35f);
-    VolumetricFitnessEval* volumetricEval = dynamic_cast<VolumetricFitnessEval*>(eval);
-    volumetricEval->SetGrid(referenceMesh, 0);
-
-    std::vector<TreeStructure> population;
-    const int popSize = poplSize;
-    int elit = ceil(popSize / 5);
-    if (elit % 2 == 1) { elit++; }
-    //MGlobal::displayInfo(MString("Elitism: ") + MString(elit));
-    const int elitism = elit; // must be even!!!!!!
-    population.reserve(popSize * 2);
-    for (int i = 0; i < popSize; ++i) {
-        std::string iteratedStr = sys.getIteration(3, i);
-        //std::cout << iteratedStr << std::endl;
-        population.emplace_back(std::move(TreeStructure(i, iteratedStr, 0.0f, 90.0f, 0.25f, 3.0f)));
-    }
-
-    std::vector<TreeStructure> newPopulation;
-    newPopulation.reserve(popSize * 2);
-
-    const int numGenerations = nGen;
-    for (int i = 0; i < numGenerations; ++i) {
-        std::cout << "New Generation: " << i << std::endl;
-        // Compute fitness scores
-        for (int j = 0; j < popSize; ++j) {
-            //std::cout << "Handling pop member: " << j << std::endl;
-            Mesh treeMesh = population[j].GetTreeMesh(branchMesh, leafMesh); // Get the current pop member's mesh
-            if (treeMesh.GetTriangles().size() == 0) {
-                population[j].fitnessScore = -9999999999;
-                continue;
-            }
-            else {
-                volumetricEval->SetGrid(treeMesh, 1); // set the grid points
-                population[j].fitnessScore = volumetricEval->Evaluate(); // get the evaluated score
-                // TODO: simplify the above to a single function call
-            }
-        }
-
-        // Sort based on fitness
-        std::sort(population.begin(), population.end(), [](TreeStructure& a, TreeStructure& b) { return a.fitnessScore > b.fitnessScore; });
-
-        newPopulation.clear();
-
-        // Elitism
-        for (int e = 0; e < elitism; ++e) {
-            newPopulation.push_back(population[e]);
-        }
-
-        // Crossover/Mutation
-        for (int r = elitism; r - elitism < popSize - elitism; r += 2) {
-            TreeStructure& par1 = population[r];
-            TreeStructure& par2 = population[r + 1];
-            int m1 = par1.Mutate(sys.getRules());
-            int m2 = par2.Mutate(sys.getRules());
-            if (m1 >= 3 && m2 >= 3) { // neither parent mutated
-                par1.Crossover(&par2);
-            }
-            newPopulation.push_back(par1);
-            newPopulation.push_back(par2);
-        }
-        population = newPopulation;
-    }
-
-    // get tree meshes
     std::vector<Mesh> treeMeshes;
-    for (int i = 0; i < nPrev; ++i) {
-        //std::cout << "Fitness: " << population[i].fitnessScore << std::endl;
-        treeMeshes.push_back(population[i].GetTreeMesh(branchMesh, leafMesh));
+    if (fitStr == MString("radioButton1"))
+    {
+        // Load reference model
+        Mesh referenceMesh = Mesh();
+        referenceMesh.LoadFromFile(tgtStr.asChar());
+        
+        // Fitness evaluation
+        FitnessEvalMethod* eval = new VolumetricFitnessEval(0.35f);
+        VolumetricFitnessEval* volumetricEval = dynamic_cast<VolumetricFitnessEval*>(eval);
+        volumetricEval->SetGrid(referenceMesh, 0);
+
+        std::vector<TreeStructure> population;
+        const int popSize = poplSize;
+        int elit = ceil(popSize / 5);
+        if (elit % 2 == 1) { elit++; }
+        const int elitism = elit; // must be even!!!!!!
+        population.reserve(popSize * 2);
+        for (int i = 0; i < popSize; ++i) {
+            std::string iteratedStr = sys.getIteration(3, i);
+            //std::cout << iteratedStr << std::endl;
+            population.emplace_back(std::move(TreeStructure(i, iteratedStr, 0.0f, 90.0f, 0.25f, 3.0f)));
+        }
+
+        std::vector<TreeStructure> newPopulation;
+        newPopulation.reserve(popSize * 2);
+
+        const int numGenerations = nGen;
+        for (int i = 0; i < numGenerations; ++i) {
+            std::cout << "New Generation: " << i << std::endl;
+            // Compute fitness scores
+            for (int j = 0; j < popSize; ++j) {
+                //std::cout << "Handling pop member: " << j << std::endl;
+                Mesh treeMesh = population[j].GetTreeMesh(branchMesh, leafMesh); // Get the current pop member's mesh
+                if (treeMesh.GetTriangles().size() == 0) {
+                    population[j].fitnessScore = -9999999999;
+                    continue;
+                }
+                else {
+                    volumetricEval->SetGrid(treeMesh, 1); // set the grid points
+                    population[j].fitnessScore = volumetricEval->Evaluate(); // get the evaluated score
+                    // TODO: simplify the above to a single function call
+                }
+            }
+
+            // Sort based on fitness
+            std::sort(population.begin(), population.end(), [](TreeStructure& a, TreeStructure& b) { return a.fitnessScore > b.fitnessScore; });
+
+            newPopulation.clear();
+
+            // Elitism
+            for (int e = 0; e < elitism; ++e) {
+                newPopulation.push_back(population[e]);
+            }
+
+            // Crossover/Mutation
+            for (int r = elitism; r - elitism < popSize - elitism; r += 2) {
+                TreeStructure& par1 = population[r];
+                TreeStructure& par2 = population[r + 1];
+                int m1 = par1.Mutate(sys.getRules());
+                int m2 = par2.Mutate(sys.getRules());
+                if (m1 >= 3 && m2 >= 3) { // neither parent mutated
+                    par1.Crossover(&par2);
+                }
+                newPopulation.push_back(par1);
+                newPopulation.push_back(par2);
+            }
+            population = newPopulation;
+        }
+
+        // get tree meshes
+        for (int i = 0; i < nPrev; ++i) {
+            //std::cout << "Fitness: " << population[i].fitnessScore << std::endl;
+            treeMeshes.push_back(population[i].GetTreeMesh(branchMesh, leafMesh));
+        }
+    }
+    else if (fitStr == MString("radioButton2"))
+    {
+        Camera camera = Camera(glm::vec3(0, 5, 16), glm::vec3(0, 0, 0), 0.7853981634f, 1.0f, 0.01f, 100.0f);
+        
+        // Fitness evaluation
+        FitnessEvalMethod* eval = new ImageFitnessEval();
+        ImageFitnessEval* imageEval = dynamic_cast<ImageFitnessEval*>(eval);
+        imageEval->SetRefImage(tgtStr.asChar());
+
+        std::vector<TreeStructure> population;
+        const int popSize = poplSize;
+        int elit = ceil(popSize / 5);
+        if (elit % 2 == 1) { elit++; }
+        const int elitism = elit; // must be even!!!!!!
+        population.reserve(popSize * 2);
+        for (int i = 0; i < popSize; ++i) {
+            std::string iteratedStr = sys.getIteration(3, i);
+            //std::cout << iteratedStr << std::endl;
+            population.emplace_back(std::move(TreeStructure(i, iteratedStr, 0.0f, 90.0f, 0.25f, 3.0f)));
+        }
+
+        std::vector<TreeStructure> newPopulation;
+        newPopulation.reserve(popSize * 2);
+
+        const int numGenerations = nGen;
+        for (int i = 0; i < numGenerations; ++i) {
+            std::cout << "New Generation: " << i << std::endl;
+            // Compute fitness scores
+            for (int j = 0; j < popSize; ++j) {
+                //std::cout << "Handling pop member: " << j << std::endl;
+                Mesh treeMesh = population[j].GetTreeMesh(branchMesh, leafMesh); // Get the current pop member's mesh
+                if (treeMesh.GetTriangles().size() == 0) {
+                    population[j].fitnessScore = -9999999999;
+                    continue;
+                }
+                else {
+                    imageEval->SetCurrImage(treeMesh, camera.GetViewProj(), glm::mat4(1.0f));
+                    population[j].fitnessScore = imageEval->Evaluate(); // get the evaluated score
+                }
+            }
+
+            // Sort based on fitness
+            std::sort(population.begin(), population.end(), [](TreeStructure& a, TreeStructure& b) { return a.fitnessScore > b.fitnessScore; });
+
+            newPopulation.clear();
+
+            // Elitism
+            for (int e = 0; e < elitism; ++e) {
+                newPopulation.push_back(population[e]);
+            }
+
+            // Crossover/Mutation
+            for (int r = elitism; r - elitism < popSize - elitism; r += 2) {
+                TreeStructure& par1 = population[r];
+                TreeStructure& par2 = population[r + 1];
+                int m1 = par1.Mutate(sys.getRules());
+                int m2 = par2.Mutate(sys.getRules());
+                if (m1 >= 3 && m2 >= 3) { // neither parent mutated
+                    par1.Crossover(&par2);
+                }
+                newPopulation.push_back(par1);
+                newPopulation.push_back(par2);
+            }
+            population = newPopulation;
+        }
+
+        // get tree meshes
+        for (int i = 0; i < nPrev; ++i) {
+            //std::cout << "Fitness: " << population[i].fitnessScore << std::endl;
+            treeMeshes.push_back(population[i].GetTreeMesh(branchMesh, leafMesh));
+        }
     }
 
     // CREATING GEOMETRY

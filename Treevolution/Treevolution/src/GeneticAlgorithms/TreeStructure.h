@@ -14,6 +14,7 @@ class TreeNode {
 public:
     char name;
     float param;
+    float param2;
     glm::vec3 axis;
     TreeNode* parent;
     std::vector<TreeNode*> children;
@@ -22,6 +23,7 @@ public:
     TreeNode(TreeNode* t);
     TreeNode(char c, float f, TreeNode* parent);
     TreeNode(char c, float f, glm::vec3 &a, TreeNode* parent);
+    TreeNode(char c, float f, float f2, glm::vec3 &a, TreeNode* parent);
     ~TreeNode();
 
     char GetName() const {
