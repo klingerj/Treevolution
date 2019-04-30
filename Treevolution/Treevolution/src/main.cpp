@@ -123,8 +123,8 @@ int main() {
     treeMesh.Create();*/
 
     // Load reference model
-    Mesh referenceMesh = Mesh();
-    referenceMesh.LoadFromFile("res/models/tallestBoi.obj");
+    //Mesh referenceMesh = Mesh();
+    //referenceMesh.LoadFromFile("res/models/tallestBoi.obj");
     //referenceMesh.Create();
 
     // int result = stbi_write_png("./test.png", 800, 600, 4, imgData, 800 * 4);
@@ -136,7 +136,7 @@ int main() {
     //VolumetricFitnessEval* volumetricEval = dynamic_cast<VolumetricFitnessEval*>(eval);
     ImageFitnessEval* imageEval = dynamic_cast<ImageFitnessEval*>(eval);
     //volumetricEval->SetGrid(referenceMesh, 0);
-    imageEval->SetRefImage("res/images/input/YTreeSmallRandom2.png");
+    imageEval->SetRefImage("res/images/input/Heart.png");
 
     //volumetricEval->SetGrid(treeMesh, 1);
     // TODO: better way to do this other than dynamic casting?
@@ -148,20 +148,20 @@ int main() {
     }
     gridPoints.Create();*/
 
-    const int elitism = 10; // must be even!!!!!!
+    const int elitism = 30; // must be even!!!!!!
     std::vector<TreeStructure> population;
-    constexpr int popSize = 50;
+    constexpr int popSize = 300;
     population.reserve(popSize * 2);
     for (int i = 0; i < popSize; ++i) {
         std::string iteratedStr = sys.getIteration(3, i);
-        std::cout << iteratedStr << std::endl;
+        //std::cout << iteratedStr << std::endl;
         population.emplace_back(std::move(TreeStructure(i, iteratedStr, 0.0f, 90.0f, 0.25f, 3.0f)));
     }
 
     std::vector<TreeStructure> newPopulation;
     newPopulation.reserve(popSize);
 
-    constexpr int numGenerations = 25;
+    constexpr int numGenerations = 800;
 
     for (int i = 0; i < numGenerations; ++i) {
         std::cout << "New Generation: " << i << std::endl;
