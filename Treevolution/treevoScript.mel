@@ -5,6 +5,7 @@ global proc treevoScript()
     
     frameLayout -label "Genetic Algorithm Parameters" -collapsable false;
     button -label "Branch Mesh" -command "browseMeshFiles";
+    button -label "Leaf Mesh" -command "browseLeafFiles";
     intSliderGrp -label "Population Size" -field true -minValue 1 -maxValue 400 -value 200 popSlider;
     intSliderGrp -label "# of Generations" -field true -minValue 1 -maxValue 100 -value 50 ngSlider;
     intSliderGrp -label "# of Previews" -field true -minValue 1 -maxValue 20 -value 1 npSlider;
@@ -19,9 +20,9 @@ global proc treevoScript()
     setParent ..;
     radioCollection -edit -select $f1 $collection;
 
-    button -label "Target Volume" -command "browseTgtFiles";
+    button -label "Target Volume or Image" -command "browseTgtFiles";
     
-    frameLayout -label " ";
+    frameLayout -label " " -collapsable false;
     button -label "Generate" -command "createTree";
     button -label "Cancel" -command "deleteUI treeWindow";
     
@@ -35,9 +36,17 @@ global proc int browseMeshFiles() {
    return true;
 }
 
+global proc int browseLeafFiles() {
+   global string $inLeafMesh;
+   string $dir[] = `fileDialog2 -fileFilter "*.obj" -fm 1`;
+   $inLeafMesh = $dir[0];
+   return true;
+}
+
 global proc int browseTgtFiles() {
    global string $tgtVol;
-   string $dir[] = `fileDialog2 -fileFilter "*.obj" -fm 1`;
+   string $multFilters = "All Files (*.*)";
+   string $dir[] = `fileDialog2 -fileFilter $multFilters -fm 1`;
    $tgtVol = $dir[0];
    return true;
 }
@@ -45,6 +54,7 @@ global proc int browseTgtFiles() {
 global proc createTree()
 {   
     global string $inMesh;
+    global string $inLeafMesh;
     int $pop = `intSliderGrp -q -v popSlider`;
     int $ng = `intSliderGrp -q -v ngSlider`;
     int $np = `intSliderGrp -q -v npSlider`;
@@ -54,6 +64,7 @@ global proc createTree()
     
     createNode TreevolutionNode;
     setAttr TreevolutionNode1.inMesh -type "string" $inMesh;
+    setAttr TreevolutionNode1.inLeafMesh -type "string" $inLeafMesh;
     setAttr TreevolutionNode1.popSize $pop;
     setAttr TreevolutionNode1.numGen $ng;
     setAttr TreevolutionNode1.numPreview $np;
