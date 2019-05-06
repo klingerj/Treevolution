@@ -105,10 +105,10 @@ int main() {
     
     // Load base branch model
     Mesh branchMesh = Mesh();
-    branchMesh.LoadFromFile("res/models/cube.obj");
+    branchMesh.LoadFromFile("res/models/cylinder.obj");
 
     Mesh leafMesh = Mesh();
-    leafMesh.LoadFromFile("res/models/sphere.obj");
+    leafMesh.LoadFromFile("res/models/leaf.obj");
 
 	  // Create L-system
 	  LSystem sys;
@@ -130,15 +130,14 @@ int main() {
     // int result = stbi_write_png("./test.png", 800, 600, 4, imgData, 800 * 4);
 
 
-    // Volumetric fitness evaluation
-    //FitnessEvalMethod* eval = new VolumetricFitnessEval(0.4f);
-    FitnessEvalMethod* eval = new ImageFitnessEval();
-    //VolumetricFitnessEval* volumetricEval = dynamic_cast<VolumetricFitnessEval*>(eval);
-    ImageFitnessEval* imageEval = dynamic_cast<ImageFitnessEval*>(eval);
-    //volumetricEval->SetGrid(referenceMesh, 0);
-    imageEval->SetRefImage("res/images/input/Heart.png");
+    // Load reference model
+      Mesh referenceMesh = Mesh();
+      referenceMesh.LoadFromFile("res/models/tallestBoi.obj");
 
-    //volumetricEval->SetGrid(treeMesh, 1);
+      // Fitness evaluation
+      FitnessEvalMethod* eval = new VolumetricFitnessEval(0.35f);
+      VolumetricFitnessEval* volumetricEval = dynamic_cast<VolumetricFitnessEval*>(eval);
+      volumetricEval->SetGrid(referenceMesh, 0);
     // TODO: better way to do this other than dynamic casting?
 
     /*DrawablePoints gridPoints;
@@ -148,12 +147,12 @@ int main() {
     }
     gridPoints.Create();*/
 
-    const int elitism = 30; // must be even!!!!!!
+    const int elitism = 2; // must be even!!!!!!
     std::vector<TreeStructure> population;
-    constexpr int popSize = 300;
+    constexpr int popSize = 10;
     population.reserve(popSize * 2);
     for (int i = 0; i < popSize; ++i) {
-        std::string iteratedStr = sys.getIteration(3, i);
+        std::string iteratedStr = sys.getIteration(4, i);
         //std::cout << iteratedStr << std::endl;
         population.emplace_back(std::move(TreeStructure(i, iteratedStr, 0.0f, 90.0f, 0.25f, 3.0f)));
     }
@@ -161,7 +160,7 @@ int main() {
     std::vector<TreeStructure> newPopulation;
     newPopulation.reserve(popSize);
 
-    constexpr int numGenerations = 800;
+    constexpr int numGenerations = 20;
 
     for (int i = 0; i < numGenerations; ++i) {
         std::cout << "New Generation: " << i << std::endl;
@@ -174,10 +173,10 @@ int main() {
                 continue;
             }
             else {
-                imageEval->SetCurrImage(treeMesh, camera.GetViewProj(), glm::mat4(1.0f));
-                // volumetricEval->SetGrid(treeMesh, 1); // set the grid points
-                // population[j].fitnessScore = volumetricEval->Evaluate(); // get the evaluated score
-                population[j].fitnessScore = imageEval->Evaluate(); // get the evaluated score
+                //imageEval->SetCurrImage(treeMesh, camera.GetViewProj(), glm::mat4(1.0f));
+                volumetricEval->SetGrid(treeMesh, 1); // set the grid points
+                population[j].fitnessScore = volumetricEval->Evaluate(); // get the evaluated score
+                //population[j].fitnessScore = imageEval->Evaluate(); // get the evaluated score
             }
         }
         

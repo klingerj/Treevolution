@@ -136,8 +136,6 @@ MObject TreevolutionNode::createMesh(MObject& outData, const MString& meshStr, c
     const MString& tgtStr, MStatus& stat)
 {
     // DO MAIN
-    MGlobal::displayInfo(MString("IN CREATE"));
-    //MGlobal::displayInfo(fitStr); 3d vol will be called "radioButton1" and 2d image "radioButton2"
     
     // Load base branch model
     Mesh branchMesh = Mesh();
@@ -150,11 +148,7 @@ MObject TreevolutionNode::createMesh(MObject& outData, const MString& meshStr, c
     LSystem sys;
     sys.setDefaultStep(0.1f);
     sys.setDefaultAngle(30.0f);
-    sys.loadProgramFromString("F\nF->FX[+F]X[-F]X\nF->FX\nF->FX[+F]X"); //taken from simple1.txt
-
-    // TO TEST MESH SHOWS UP
-    //TreeStructure theTree = TreeStructure(1, iteratedStr, 0.0f, 90.0f, 1.0f, 3.0f);
-    //Mesh treeMesh = theTree.GetTreeMesh(branchMesh);
+    sys.loadProgramFromString("F\nF->FXXX[X+FXX]XXXX[XX-FXX]XXXX\nF->FXXXX\nF->FXXX[X+FXXXX]XXXX");
 
     std::vector<Mesh> treeMeshes;
     if (fitStr == MString("radioButton1"))
@@ -175,8 +169,7 @@ MObject TreevolutionNode::createMesh(MObject& outData, const MString& meshStr, c
         const int elitism = elit; // must be even!!!!!!
         population.reserve(popSize * 2);
         for (int i = 0; i < popSize; ++i) {
-            std::string iteratedStr = sys.getIteration(3, i);
-            //std::cout << iteratedStr << std::endl;
+            std::string iteratedStr = sys.getIteration(4, i);
             population.emplace_back(std::move(TreeStructure(i, iteratedStr, 0.0f, 90.0f, 0.25f, 3.0f)));
         }
 
@@ -185,10 +178,11 @@ MObject TreevolutionNode::createMesh(MObject& outData, const MString& meshStr, c
 
         const int numGenerations = nGen;
         for (int i = 0; i < numGenerations; ++i) {
-            std::cout << "New Generation: " << i << std::endl;
+            MString msg = MString("New Generation : ");
+            msg += i;
+            MGlobal::displayInfo(msg);
             // Compute fitness scores
             for (int j = 0; j < popSize; ++j) {
-                //std::cout << "Handling pop member: " << j << std::endl;
                 Mesh treeMesh = population[j].GetTreeMesh(branchMesh, leafMesh); // Get the current pop member's mesh
                 if (treeMesh.GetTriangles().size() == 0) {
                     population[j].fitnessScore = -9999999999;
@@ -228,7 +222,6 @@ MObject TreevolutionNode::createMesh(MObject& outData, const MString& meshStr, c
 
         // get tree meshes
         for (int i = 0; i < nPrev; ++i) {
-            //std::cout << "Fitness: " << population[i].fitnessScore << std::endl;
             treeMeshes.push_back(population[i].GetTreeMesh(branchMesh, leafMesh));
         }
     }
@@ -248,8 +241,7 @@ MObject TreevolutionNode::createMesh(MObject& outData, const MString& meshStr, c
         const int elitism = elit; // must be even!!!!!!
         population.reserve(popSize * 2);
         for (int i = 0; i < popSize; ++i) {
-            std::string iteratedStr = sys.getIteration(3, i);
-            //std::cout << iteratedStr << std::endl;
+            std::string iteratedStr = sys.getIteration(4, i);
             population.emplace_back(std::move(TreeStructure(i, iteratedStr, 0.0f, 90.0f, 0.25f, 3.0f)));
         }
 
@@ -258,10 +250,11 @@ MObject TreevolutionNode::createMesh(MObject& outData, const MString& meshStr, c
 
         const int numGenerations = nGen;
         for (int i = 0; i < numGenerations; ++i) {
-            std::cout << "New Generation: " << i << std::endl;
+            MString msg = MString("New Generation : ");
+            msg += i;
+            MGlobal::displayInfo(msg);
             // Compute fitness scores
             for (int j = 0; j < popSize; ++j) {
-                //std::cout << "Handling pop member: " << j << std::endl;
                 Mesh treeMesh = population[j].GetTreeMesh(branchMesh, leafMesh); // Get the current pop member's mesh
                 if (treeMesh.GetTriangles().size() == 0) {
                     population[j].fitnessScore = -9999999999;
@@ -300,7 +293,6 @@ MObject TreevolutionNode::createMesh(MObject& outData, const MString& meshStr, c
 
         // get tree meshes
         for (int i = 0; i < nPrev; ++i) {
-            //std::cout << "Fitness: " << population[i].fitnessScore << std::endl;
             treeMeshes.push_back(population[i].GetTreeMesh(branchMesh, leafMesh));
         }
     }

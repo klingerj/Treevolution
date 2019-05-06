@@ -135,7 +135,8 @@ std::vector<glm::vec3> VolumetricFitnessEval::GetGridPoints(uint8_t gridType) {
 // Image-based fitness
 
 ImageFitnessEval::ImageFitnessEval() : fbo(-1), rbo(-1), refImage(nullptr), currImage(nullptr),
-                                       width(400), height(400), sp("src/Shaders/flat.vert", "src/Shaders/flat.frag") {
+                                       width(400), height(400), 
+                                       sp("src/Shaders/flat.vert", "src/Shaders/flat.frag") {
     // setup framebuffer
     glGenFramebuffers(1, &fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
