@@ -236,7 +236,7 @@ void TreeStructure::Crossover(TreeStructure* parent2)
 }
 void TreeStructure::Grow(const std::map<std::string, std::vector<std::string>> &rules)
 {
-    if (nodeList.size() == 0) {
+    if (nodeList.size() <= 2) {
         return;
     }
     // get a random node
@@ -271,7 +271,7 @@ void TreeStructure::Cut()
     int rand = (int)floor(chooseDist(mGenerator));
     TreeNode* gene = this->GetNodeAtCount(rand);
 
-    if (gene != mRoot && gene->parent)
+    if (gene != mRoot && gene->parent && gene->parent->children.size() > 0)
     {
         int idx = GetIndexInParentList(gene);
         gene->parent->children.erase(gene->parent->children.begin() + idx);
