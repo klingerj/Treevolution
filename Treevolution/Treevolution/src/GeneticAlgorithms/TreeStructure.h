@@ -53,6 +53,7 @@ public:
     void ClearNodeList() { nodeList.clear(); }
 
     void CreateNodeList(TreeNode* root);
+    void CreateCopyNodeList(TreeNode* root, TreeNode* toCopy);
 
     void processNode(TreeNode * currNode, Mesh & baseMesh, Mesh & leafMesh);
 

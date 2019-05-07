@@ -60,7 +60,7 @@ TreeStructure::TreeStructure(int id, std::string gram, float minAngle, float max
 }
 
 TreeStructure::TreeStructure(TreeStructure* t, TreeNode* root) : mId(t->GetId()), mGrammar(t->GetGram()), 
-    mMinAngle(t->GetMinAngle()), mMaxAngle(t->GetMaxAngle()), mMinLen(t->GetMinLen()), mMaxLen(t->GetMaxLen()), mRoot(root)
+    mMinAngle(t->GetMinAngle()), mMaxAngle(t->GetMaxAngle()), mMinLen(t->GetMinLen()), mMaxLen(t->GetMaxLen())
 {
     mGenerator.seed(mId);
     mAxisDist = std::uniform_real_distribution<float>(-1.0, 1.0);
@@ -68,7 +68,8 @@ TreeStructure::TreeStructure(TreeStructure* t, TreeNode* root) : mId(t->GetId())
     mLenDist = std::uniform_real_distribution<float>(mMinLen, mMaxLen);
     
     nodeList.clear();
-    CreateNodeList(mRoot);
+    mRoot = new TreeNode(root);
+    CreateCopyNodeList(mRoot, root);
 }
 
 TreeStructure::~TreeStructure()
@@ -161,6 +162,17 @@ void TreeStructure::CreateNodeList(TreeNode* root)
     for (TreeNode* c : root->children)
     {
         CreateNodeList(c);
+    }
+}
+
+void TreeStructure::CreateCopyNodeList(TreeNode* root, TreeNode* toCopy)
+{
+    nodeList.push_back(root);
+    for (TreeNode* c : toCopy->children)
+    {
+        TreeNode* newC = new TreeNode(c);
+        root->children.push_back(newC);
+        CreateCopyNodeList(newC, c);
     }
 }
 
