@@ -194,7 +194,8 @@ int main() {
         }*/
 
         for (int e = 0; e < elitism; e++) {
-            newPopulation.push_back(population[e]);
+            TreeStructure cpy = new TreeStructure(population[e]);
+            newPopulation.push_back(cpy);
             population.pop_back();
         }
 

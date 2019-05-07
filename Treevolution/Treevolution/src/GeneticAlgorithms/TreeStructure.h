@@ -36,7 +36,7 @@ public:
     int fitnessScore;
     TreeStructure(int id, std::string gram, float minAngle, float maxAngle, 
         float minLen, float maxLen);
-    TreeStructure(TreeStructure* t, TreeNode* root);
+    TreeStructure(TreeStructure* t);
     ~TreeStructure();
 
     // getters and setters
