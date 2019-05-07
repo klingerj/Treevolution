@@ -131,13 +131,15 @@ int main() {
 
 
     // Load reference model
-      Mesh referenceMesh = Mesh();
-      referenceMesh.LoadFromFile("res/models/tallestBoi.obj");
+      //Mesh referenceMesh = Mesh();
+      //referenceMesh.LoadFromFile("res/models/tallestBoi.obj");
 
       // Fitness evaluation
-      FitnessEvalMethod* eval = new VolumetricFitnessEval(0.35f);
-      VolumetricFitnessEval* volumetricEval = dynamic_cast<VolumetricFitnessEval*>(eval);
-      volumetricEval->SetGrid(referenceMesh, 0);
+    FitnessEvalMethod* eval = new ImageFitnessEval();
+    //VolumetricFitnessEval* volumetricEval = dynamic_cast<VolumetricFitnessEval*>(eval);
+    ImageFitnessEval* imageEval = dynamic_cast<ImageFitnessEval*>(eval);
+    //volumetricEval->SetGrid(referenceMesh, 0);
+    imageEval->SetRefImage("res/images/input/Heart.png");
     // TODO: better way to do this other than dynamic casting?
 
     /*DrawablePoints gridPoints;
@@ -147,9 +149,9 @@ int main() {
     }
     gridPoints.Create();*/
 
-    const int elitism = 2; // must be even!!!!!!
+    const int elitism = 8; // must be even!!!!!!
     std::vector<TreeStructure> population;
-    constexpr int popSize = 10;
+    constexpr int popSize = 50;
     population.reserve(popSize * 2);
     for (int i = 0; i < popSize; ++i) {
         std::string iteratedStr = sys.getIteration(4, i);
@@ -160,7 +162,7 @@ int main() {
     std::vector<TreeStructure> newPopulation;
     newPopulation.reserve(popSize);
 
-    constexpr int numGenerations = 20;
+    constexpr int numGenerations = 50;
 
     for (int i = 0; i < numGenerations; ++i) {
         std::cout << "New Generation: " << i << std::endl;
@@ -173,10 +175,10 @@ int main() {
                 continue;
             }
             else {
-                //imageEval->SetCurrImage(treeMesh, camera.GetViewProj(), glm::mat4(1.0f));
-                volumetricEval->SetGrid(treeMesh, 1); // set the grid points
-                population[j].fitnessScore = volumetricEval->Evaluate(); // get the evaluated score
-                //population[j].fitnessScore = imageEval->Evaluate(); // get the evaluated score
+                imageEval->SetCurrImage(treeMesh, camera.GetViewProj(), glm::mat4(1.0f));
+                //volumetricEval->SetGrid(treeMesh, 1); // set the grid points
+                //population[j].fitnessScore = volumetricEval->Evaluate(); // get the evaluated score
+                population[j].fitnessScore = imageEval->Evaluate(); // get the evaluated score
             }
         }
         
@@ -186,9 +188,14 @@ int main() {
         newPopulation.clear();
 
         // Elitism
-        for (int e = 0; e < elitism; ++e) {
+        /*for (int e = 0; e < elitism; ++e) {
             newPopulation.push_back(population[e]);
             population.erase(population.begin() + e);
+        }*/
+
+        for (int e = 0; e < elitism; e++) {
+            newPopulation.push_back(population[e]);
+            population.pop_back();
         }
 
         // Crossover/Mutation
@@ -226,6 +233,7 @@ int main() {
             newPopulation.push_back(par1);
             newPopulation.push_back(par2);
         }*/
+        population.clear();
         population = newPopulation;
     }
 

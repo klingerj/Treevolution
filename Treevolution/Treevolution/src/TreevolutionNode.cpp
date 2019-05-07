@@ -169,7 +169,7 @@ MObject TreevolutionNode::createMesh(MObject& outData, const MString& meshStr, c
         const int elitism = elit; // must be even!!!!!!
         population.reserve(popSize * 2);
         for (int i = 0; i < popSize; ++i) {
-            std::string iteratedStr = sys.getIteration(4, i);
+            std::string iteratedStr = sys.getIteration(3, i);
             population.emplace_back(std::move(TreeStructure(i, iteratedStr, 0.0f, 90.0f, 0.25f, 3.0f)));
         }
 
