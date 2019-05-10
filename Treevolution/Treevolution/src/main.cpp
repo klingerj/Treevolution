@@ -139,7 +139,7 @@ int main() {
     //VolumetricFitnessEval* volumetricEval = dynamic_cast<VolumetricFitnessEval*>(eval);
     ImageFitnessEval* imageEval = dynamic_cast<ImageFitnessEval*>(eval);
     //volumetricEval->SetGrid(referenceMesh, 0);
-    imageEval->SetRefImage("res/images/input/Heart.png");
+    imageEval->SetRefImage("res/images/input/starTree.png");
     // TODO: better way to do this other than dynamic casting?
 
     /*DrawablePoints gridPoints;
@@ -149,9 +149,9 @@ int main() {
     }
     gridPoints.Create();*/
 
-    const int elitism = 8; // must be even!!!!!!
+    const int elitism = 12; // must be even!!!!!!
     std::vector<TreeStructure> population;
-    constexpr int popSize = 50;
+    constexpr int popSize = 60;
     population.reserve(popSize * 2);
     for (int i = 0; i < popSize; ++i) {
         std::string iteratedStr = sys.getIteration(4, i);
@@ -162,7 +162,7 @@ int main() {
     std::vector<TreeStructure> newPopulation;
     newPopulation.reserve(popSize);
 
-    constexpr int numGenerations = 50;
+    constexpr int numGenerations = 85;
 
     for (int i = 0; i < numGenerations; ++i) {
         std::cout << "New Generation: " << i << std::endl;
