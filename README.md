@@ -41,7 +41,9 @@ For image/silhouette fitness evaluation, we simply:
 
 ## Results
 
+![Triangle Reference](./Images/triangleTree.png)  ![Triangle Output](./Images/triTreeTry.JPG)
 
+![Star Reference](./Images/starTree.png)  ![Star Output](./Images/starTry.JPG)
 
 # Resources
 [Learn OpenGL](https://learnopengl.com/)  
